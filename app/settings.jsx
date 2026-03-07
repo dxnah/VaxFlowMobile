@@ -13,7 +13,7 @@ import { useUser } from '../context/UserContext';
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { username, setUsername, darkMode, setDarkMode } = useUser();
+  const { username, setUsername, darkMode, setDarkMode, avatarUri, setAvatarUri } = useUser();
 
   const [localUsername, setLocalUsername] = useState(username);
   const [localDark, setLocalDark]         = useState(darkMode);
@@ -24,7 +24,6 @@ export default function SettingsScreen() {
   const [showCurrent, setShowCurrent]     = useState(false);
   const [showNew, setShowNew]             = useState(false);
   const [showConfirm, setShowConfirm]     = useState(false);
-  const [avatarUri, setAvatarUri]         = useState(null);
   const [vaccineAlerts, setVaccineAlerts] = useState(true);
   const [stockAlerts, setStockAlerts]     = useState(true);
   const [saving, setSaving]               = useState(false);
@@ -39,11 +38,16 @@ export default function SettingsScreen() {
     sub:         dark ? '#7aada8' : '#6ba8a1',
     input:       dark ? '#1e2928' : '#f7fcfb',
     inputBorder: dark ? '#2e3837' : '#e0efed',
+    topBar:      dark ? '#1a2e2c' : '#2BAF9E',
+    topBarText:  dark ? '#e8f0ef' : '#ffffff',
+    topBarSub:   dark ? '#7aada8' : 'rgba(255,255,255,0.75)',
+    topBarBtn:   dark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.2)',
     teal:        '#2BAF9E',
     red:         '#c62828',
     orange:      '#f57f17',
   };
 
+  // ✅ Saves directly to context so dashboard sees it immediately
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -86,12 +90,7 @@ export default function SettingsScreen() {
   };
 
   const Section = ({ label, children }) => (
-    <View style={{
-      backgroundColor: C.card, marginHorizontal: 14, marginTop: 10,
-      borderRadius: 16, overflow: 'hidden',
-      shadowColor: '#2BAF9E', shadowOpacity: dark ? 0 : 0.08,
-      shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2,
-    }}>
+    <View style={{ backgroundColor: C.card, marginHorizontal: 14, marginTop: 10, borderRadius: 16, overflow: 'hidden', shadowColor: '#2BAF9E', shadowOpacity: dark ? 0 : 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 }}>
       <View style={{ paddingHorizontal: 18, paddingTop: 14, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: C.border }}>
         <Text style={{ fontSize: 11, fontWeight: '700', color: C.teal, letterSpacing: 1.1, textTransform: 'uppercase' }}>{label}</Text>
       </View>
@@ -101,23 +100,17 @@ export default function SettingsScreen() {
 
   const Field = ({ label, icon, last, children }) => (
     <View style={{ paddingHorizontal: 18, paddingVertical: 14, borderBottomWidth: last ? 0 : 1, borderBottomColor: C.border }}>
-      <Text style={{ fontSize: 11, fontWeight: '600', color: C.sub, marginBottom: 6, letterSpacing: 0.8, textTransform: 'uppercase' }}>
-        {icon}  {label}
-      </Text>
+      <Text style={{ fontSize: 11, fontWeight: '600', color: C.sub, marginBottom: 6, letterSpacing: 0.8, textTransform: 'uppercase' }}>{icon}  {label}</Text>
       {children}
     </View>
   );
 
   const PassField = ({ label, icon, value, onChange, show, onToggleShow, placeholder, last }) => (
     <Field label={label} icon={icon} last={last}>
-      <View style={{
-        flexDirection: 'row', alignItems: 'center',
-        backgroundColor: C.input, borderWidth: 2, borderColor: C.inputBorder, borderRadius: 10, paddingHorizontal: 12,
-      }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: C.input, borderWidth: 2, borderColor: C.inputBorder, borderRadius: 10, paddingHorizontal: 12 }}>
         <TextInput
           style={{ flex: 1, paddingVertical: Platform.OS === 'ios' ? 10 : 8, fontSize: 14, color: C.text }}
-          value={value} onChangeText={onChange}
-          placeholder={placeholder} placeholderTextColor={C.sub}
+          value={value} onChangeText={onChange} placeholder={placeholder} placeholderTextColor={C.sub}
           secureTextEntry={!show} autoCapitalize="none" autoCorrect={false}
         />
         <TouchableOpacity onPress={() => onToggleShow()} activeOpacity={0.6} style={{ padding: 8 }}>
@@ -128,11 +121,7 @@ export default function SettingsScreen() {
   );
 
   const ToggleRow = ({ icon, label, sub, value, onValueChange, last }) => (
-    <View style={{
-      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-      paddingHorizontal: 18, paddingVertical: 14,
-      borderBottomWidth: last ? 0 : 1, borderBottomColor: C.border,
-    }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingVertical: 14, borderBottomWidth: last ? 0 : 1, borderBottomColor: C.border }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 10 }}>
         <Text style={{ fontSize: 20 }}>{icon}</Text>
         <View style={{ flex: 1 }}>
@@ -140,65 +129,42 @@ export default function SettingsScreen() {
           <Text style={{ fontSize: 12, color: C.sub, marginTop: 1 }}>{sub}</Text>
         </View>
       </View>
-      <Switch value={value} onValueChange={onValueChange}
-        trackColor={{ false: '#ccc', true: C.teal }} thumbColor="#fff" ios_backgroundColor="#ccc" />
+      <Switch value={value} onValueChange={onValueChange} trackColor={{ false: '#ccc', true: C.teal }} thumbColor="#fff" ios_backgroundColor="#ccc" />
     </View>
   );
 
   return (
     <>
-      <StatusBar backgroundColor="#2BAF9E" barStyle="light-content" translucent={false} />
-      {/* edges={['top']} — SafeAreaView handles status bar spacing consistently */}
+      <StatusBar backgroundColor={C.topBar} barStyle="light-content" translucent={false} />
       <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={['top', 'left', 'right']}>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
           {/* Top Bar */}
-          <View style={{
-            backgroundColor: '#2BAF9E',
-            paddingHorizontal: 16,
-            paddingTop: 12,
-            paddingBottom: 14,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 12,
-          }}>
-            <TouchableOpacity
-              onPress={() => router.back()}
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 10,
-                width: 36, height: 36, justifyContent: 'center', alignItems: 'center',
-              }}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="arrow-back" size={20} color="#fff" />
+          <View style={{ backgroundColor: C.topBar, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <TouchableOpacity onPress={() => router.back()} style={{ backgroundColor: C.topBarBtn, borderRadius: 10, width: 36, height: 36, justifyContent: 'center', alignItems: 'center' }} activeOpacity={0.7}>
+              <Ionicons name="arrow-back" size={20} color={C.topBarText} />
             </TouchableOpacity>
             <View>
-              <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>⚙️ User Settings</Text>
-              <Text style={{ color: 'rgba(255,255,255,0.75)', fontSize: 12 }}>Manage your account preferences</Text>
+              <Text style={{ color: C.topBarText, fontSize: 18, fontWeight: '700' }}>⚙️ User Settings</Text>
+              <Text style={{ color: C.topBarSub, fontSize: 12 }}>Manage your account preferences</Text>
             </View>
           </View>
 
           {/* Avatar */}
-          <View style={{
-            backgroundColor: C.card, paddingVertical: 28, alignItems: 'center', gap: 8,
-            borderBottomWidth: 1, borderBottomColor: C.border, marginBottom: 4,
-          }}>
+          <View style={{ backgroundColor: C.card, paddingVertical: 28, alignItems: 'center', gap: 8, borderBottomWidth: 1, borderBottomColor: C.border, marginBottom: 4 }}>
             <TouchableOpacity onPress={pickImage} activeOpacity={0.85}>
               {avatarUri ? (
-                <Image source={{ uri: avatarUri }} style={{ width: 88, height: 88, borderRadius: 44, borderWidth: 3, borderColor: '#2BAF9E' }} />
+                <Image source={{ uri: avatarUri }} style={{ width: 88, height: 88, borderRadius: 44, borderWidth: 3, borderColor: C.teal }} />
               ) : (
-                <View style={{ width: 88, height: 88, borderRadius: 44, backgroundColor: '#E8F7F5', borderWidth: 3, borderColor: '#2BAF9E', justifyContent: 'center', alignItems: 'center' }}>
-                  <Text style={{ fontSize: 32, color: '#2BAF9E', fontWeight: '700' }}>{localUsername.charAt(0).toUpperCase()}</Text>
+                <View style={{ width: 88, height: 88, borderRadius: 44, backgroundColor: '#E8F7F5', borderWidth: 3, borderColor: C.teal, justifyContent: 'center', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 32, color: C.teal, fontWeight: '700' }}>{localUsername.charAt(0).toUpperCase()}</Text>
                 </View>
               )}
-              <View style={{ position: 'absolute', bottom: 0, right: 0, backgroundColor: '#2BAF9E', borderRadius: 14, width: 28, height: 28, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: C.card }}>
+              <View style={{ position: 'absolute', bottom: 0, right: 0, backgroundColor: C.teal, borderRadius: 14, width: 28, height: 28, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: C.card }}>
                 <Ionicons name="camera" size={14} color="#fff" />
               </View>
             </TouchableOpacity>
-            <Text style={{ fontSize: 17, fontWeight: '700', color: C.text }}>{localUsername || 'Patient'}</Text>
-            <View style={{ backgroundColor: '#E8F7F5', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 3 }}>
-              <Text style={{ fontSize: 12, color: '#2BAF9E', fontWeight: '600' }}>Patient</Text>
-            </View>
+            <Text style={{ fontSize: 17, fontWeight: '700', color: C.text }}>{localUsername || 'User'}</Text>
             <Text style={{ fontSize: 11, color: C.sub }}>Tap the camera icon to change photo</Text>
           </View>
 
@@ -249,11 +215,11 @@ export default function SettingsScreen() {
 
           {/* Save */}
           <TouchableOpacity
-            style={{ backgroundColor: '#2BAF9E', marginHorizontal: 14, marginTop: 14, borderRadius: 14, paddingVertical: 15, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8, shadowColor: '#2BAF9E', shadowOpacity: 0.35, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 4, opacity: saving ? 0.8 : 1 }}
+            style={{ backgroundColor: C.teal, marginHorizontal: 14, marginTop: 14, borderRadius: 14, paddingVertical: 15, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8, elevation: 4, opacity: saving ? 0.8 : 1 }}
             onPress={handleSave} disabled={saving} activeOpacity={0.85}
           >
             {saving ? <ActivityIndicator color="#fff" size="small" /> : <Ionicons name="save-outline" size={18} color="#fff" />}
-            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700', letterSpacing: 0.4 }}>{saving ? 'Saving...' : 'Save Changes'}</Text>
+            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>{saving ? 'Saving...' : 'Save Changes'}</Text>
           </TouchableOpacity>
 
           {/* Cancel */}
