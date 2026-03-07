@@ -119,6 +119,7 @@ export default function DashboardScreen() {
           <Text style={styles.greeting}>👋 Hello, Patient</Text>
           <Text style={styles.subheading}>ABTC-CHO Vaccine Status</Text>
         </View>
+        <View style={{ width: 28 }} />
       </View>
 
       <ScrollView
