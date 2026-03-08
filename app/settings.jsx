@@ -1,16 +1,5 @@
 // app/settings.jsx
-<<<<<<< HEAD
-=======
 
-import React, { useState } from 'react';
-import {
-  View, Text, TextInput, TouchableOpacity,
-  ScrollView, Switch, Image,
-  Alert, ActivityIndicator, Platform, StatusBar
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
->>>>>>> 7c9b883d5cecbdaab524440d6143cd31dad0d1b2
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
@@ -36,7 +25,7 @@ export default function SettingsScreen() {
   const [stockAlerts,   setStockAlerts]   = useState(true);
   const [saving,        setSaving]        = useState(false);
 
-  // Use darkMode directly from context — no localDark needed
+  // Use darkMode directly from context 
   const dark = darkMode;
 
   const C = {
@@ -143,9 +132,6 @@ export default function SettingsScreen() {
         <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
           {/* Top Bar */}
-<<<<<<< HEAD
-          <SharedHeader title="⚙️ User Settings" subtitle="Manage your account preferences" />
-=======
           <View style={{ backgroundColor: C.topBar, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14, flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity onPress={() => router.back()} style={{ backgroundColor: C.topBarBtn, borderRadius: 10, width: 36, height: 36, justifyContent: 'center', alignItems: 'center' }} activeOpacity={0.7}>
               <Ionicons name="arrow-back" size={20} color={C.topBarText} />
@@ -156,8 +142,7 @@ export default function SettingsScreen() {
             </View>
             <View style={{ width: 36, height: 36 }} />
           </View>
->>>>>>> 7c9b883d5cecbdaab524440d6143cd31dad0d1b2
-
+          
           {/* Avatar */}
           <View style={[styles.avatarSection, { backgroundColor: C.card, borderBottomColor: C.border }]}>
             <TouchableOpacity onPress={pickImage} activeOpacity={0.85}>

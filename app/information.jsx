@@ -86,8 +86,6 @@ export default function InformationScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: dark ? '#1a1f1e' : '#EEF7F6' }]}>
-      <StatusBar backgroundColor={topBar} barStyle="light-content" translucent={false} />
-      <View style={[styles.statusBarSpacer, { backgroundColor: topBar }]} />
 
       <SharedHeader title="💊 Vaccine Information" subtitle="Details about each available vaccine" />
 

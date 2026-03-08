@@ -1,15 +1,5 @@
-<<<<<<< HEAD
 // app/login.jsx
-=======
-//login.jsx
 
-import React, { useState } from 'react';
-import {
-  View, Text, TextInput, TouchableOpacity,
-  ScrollView, KeyboardAvoidingView, Platform, Image
-} from 'react-native';
-import { useRouter } from 'expo-router';
->>>>>>> 7c9b883d5cecbdaab524440d6143cd31dad0d1b2
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -43,16 +33,12 @@ export default function LoginScreen() {
       <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 
-          <View style={styles.topBand}>
-            <View style={styles.topBandInner} />
-          </View>
-
           <View style={styles.brandSection}>
             <View style={styles.logoCircle}>
               <Image source={require('../assets/images/logoit.png')} style={styles.logo} resizeMode="contain" />
             </View>
             <Text style={styles.appName}>VaxFlow</Text>
-            <Text style={styles.appTagline}>ML-Assisted Vaccine Management</Text>
+            <Text style={styles.appTagline}>ML-Assisted Vaccine Management System</Text>
           </View>
 
           <View style={styles.card}>

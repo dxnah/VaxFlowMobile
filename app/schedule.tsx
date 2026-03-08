@@ -103,8 +103,6 @@ export default function PatientScheduleScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: C.topBar }]}>
-      <StatusBar backgroundColor={C.topBar} barStyle="light-content" translucent={false} />
-      <View style={[styles.statusBarSpacer, { backgroundColor: C.topBar }]} />
 
       <SharedHeader title="📅 Patient Schedule" subtitle="Track your vaccination doses" />
 

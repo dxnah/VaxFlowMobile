@@ -63,8 +63,7 @@ export default function DashboardScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: C.bg }]}>
-      <StatusBar translucent backgroundColor="transparent" barStyle={dark ? 'light-content' : 'dark-content'} />
-      <View style={[styles.statusBarSpacer, { backgroundColor: C.bg }]} />
+      <StatusBar translucent={false} backgroundColor={dark ? '#1a2e2c' : '#2BAF9E'} barStyle="light-content" />
 
       {sidebarOpen && (
         <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setSidebarOpen(false)} />
