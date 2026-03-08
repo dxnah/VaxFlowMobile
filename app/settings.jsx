@@ -154,7 +154,6 @@ export default function SettingsScreen() {
               <Text style={{ color: C.topBarText, fontSize: 18, fontWeight: '700' }}>⚙️ User Settings</Text>
               <Text style={{ color: C.topBarSub, fontSize: 12 }}>Manage your account preferences</Text>
             </View>
-            {/* Same size as back button to balance layout */}
             <View style={{ width: 36, height: 36 }} />
           </View>
 >>>>>>> 7c9b883d5cecbdaab524440d6143cd31dad0d1b2

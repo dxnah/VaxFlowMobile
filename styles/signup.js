@@ -8,6 +8,10 @@ const isSmall   = width < 360;
 
 export default StyleSheet.create({
 
+  // Top decorative band
+  topBand:         { height: 8, backgroundColor: '#f0faf9' },
+  topBandInner:    { height: 4, backgroundColor: '#f0faf9', opacity: 0.4 },
+
   // ── Screen ──
   container: {
     flex: 1,
