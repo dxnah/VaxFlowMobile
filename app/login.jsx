@@ -1,4 +1,15 @@
+<<<<<<< HEAD
 // app/login.jsx
+=======
+//login.jsx
+
+import React, { useState } from 'react';
+import {
+  View, Text, TextInput, TouchableOpacity,
+  ScrollView, KeyboardAvoidingView, Platform, Image
+} from 'react-native';
+import { useRouter } from 'expo-router';
+>>>>>>> 7c9b883d5cecbdaab524440d6143cd31dad0d1b2
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';

@@ -1,4 +1,10 @@
 // app/history.jsx
+<<<<<<< HEAD
+=======
+
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Platform, StatusBar, StyleSheet, Image, Modal, Alert } from 'react-native';
+>>>>>>> 7c9b883d5cecbdaab524440d6143cd31dad0d1b2
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
 import { Alert, Image, Modal, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';

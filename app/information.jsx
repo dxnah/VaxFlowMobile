@@ -1,4 +1,5 @@
 // app/information.jsx
+
 import React, { useState } from 'react';
 import { ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import SharedHeader from '../components/SharedHeader';

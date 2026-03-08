@@ -1,12 +1,13 @@
-// app/dashboard/schedule.tsx
+// app/schedule.tsx
+
 import React, { useState } from 'react';
 import {
   Alert, FlatList, Modal, Platform,
   ScrollView, StatusBar, StyleSheet,
   Text, TouchableOpacity, View,
 } from 'react-native';
-import SharedHeader from '../../components/SharedHeader';
-import { useUser } from '../../context/UserContext';
+import SharedHeader from '../components/SharedHeader';
+import { useUser } from '../context/UserContext';
 
 interface Dose {
   id: number;
