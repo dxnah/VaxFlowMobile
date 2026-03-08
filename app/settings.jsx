@@ -1,4 +1,5 @@
 // app/settings.jsx
+
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
@@ -47,7 +48,6 @@ export default function SettingsScreen() {
     orange:      '#f57f17',
   };
 
-  // ✅ Saves directly to context so dashboard sees it immediately
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -140,14 +140,16 @@ export default function SettingsScreen() {
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
           {/* Top Bar */}
-          <View style={{ backgroundColor: C.topBar, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <View style={{ backgroundColor: C.topBar, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14, flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity onPress={() => router.back()} style={{ backgroundColor: C.topBarBtn, borderRadius: 10, width: 36, height: 36, justifyContent: 'center', alignItems: 'center' }} activeOpacity={0.7}>
               <Ionicons name="arrow-back" size={20} color={C.topBarText} />
             </TouchableOpacity>
-            <View>
+            <View style={{ flex: 1, alignItems: 'center' }}>
               <Text style={{ color: C.topBarText, fontSize: 18, fontWeight: '700' }}>⚙️ User Settings</Text>
               <Text style={{ color: C.topBarSub, fontSize: 12 }}>Manage your account preferences</Text>
             </View>
+            {/* Same size as back button to balance layout */}
+            <View style={{ width: 36, height: 36 }} />
           </View>
 
           {/* Avatar */}

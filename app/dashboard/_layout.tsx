@@ -5,12 +5,7 @@ export default function DashboardLayout() {
     <Stack>
       <Stack.Screen 
         name="index" 
-        options={{ headerShown: false }} 
-      />
-      <Stack.Screen 
-        name="schedule" 
-        options={{ headerShown: false }} 
-      />
+        options={{ headerShown: false }}  />
     </Stack>
   );
 }

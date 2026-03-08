@@ -1,3 +1,5 @@
+// app/dashboard/index.tsx
+
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -70,7 +72,7 @@ export default function DashboardScreen() {
 
       <Modal visible={sidebarOpen} transparent={true} animationType="fade">
         <View style={styles.sidebarContainer}>
-          <View style={[styles.sidebar, { backgroundColor: C.teal }]}>
+          <View style={[styles.sidebar, { backgroundColor: '#26a69a'}]}>
 
             {/* ✅ Avatar in sidebar too */}
             <View style={styles.sidebarProfile}>
@@ -89,7 +91,7 @@ export default function DashboardScreen() {
             <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/dashboard'); }}>
               <Text style={styles.sidebarItemText}>📊 Dashboard</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/dashboard/schedule'); }}>
+            <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/schedule'); }}>
               <Text style={styles.sidebarItemText}>📅 Patient Schedule</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/information'); }}>
