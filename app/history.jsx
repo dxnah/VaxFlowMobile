@@ -1,10 +1,5 @@
 // app/history.jsx
-<<<<<<< HEAD
-=======
 
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Platform, StatusBar, StyleSheet, Image, Modal, Alert } from 'react-native';
->>>>>>> 7c9b883d5cecbdaab524440d6143cd31dad0d1b2
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
 import { Alert, Image, Modal, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
@@ -150,8 +145,6 @@ export default function HistoryScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: C.bg }]}>
-      <StatusBar backgroundColor={topBar} barStyle="light-content" translucent={false} />
-      <View style={[styles.statusBarSpacer, { backgroundColor: topBar }]} />
 
       <SharedHeader title="💉 Vaccination History" subtitle="Your digital vaccination records" />
 

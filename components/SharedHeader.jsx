@@ -8,15 +8,18 @@ import {
 import { useRouter } from 'expo-router';
 import { useUser } from '../context/UserContext';
 
-export default function SharedHeader({ title, subtitle, headerBg = '#ffffff' }) {
+
+export default function SharedHeader({ title, subtitle, headerBg = undefined }) {
   const router = useRouter();
   const { username, darkMode, avatarUri } = useUser();
   const dark = darkMode;
+  const statusBg = dark ? '#1a2e2c' : '#2BAF9E';
+  const resolvedBg = headerBg ?? (dark ? '#242b2a' : '#ffffff');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const C = {
     bg:       headerBg ?? (dark ? '#242b2a' : '#ffffff'),
-    text:     dark ? '#e8f0ef' : '#333333',
+    text: dark ? '#e8f0ef' : '#333333',
     sub:      dark ? '#7aada8' : '#999999',
     border:   dark ? '#2e3837' : '#e0e0e0',
     sidebar:  '#26a69a',
@@ -72,10 +75,10 @@ export default function SharedHeader({ title, subtitle, headerBg = '#ffffff' }) 
       </Modal>
 
       {/* Transparent status bar */}
-      <StatusBar backgroundColor="transparent" barStyle="dark-content" translucent={true} />
+      <StatusBar backgroundColor={statusBg} barStyle="light-content" translucent={false} />
 
       {/* Header Bar */}
-      <View style={[styles.header, { backgroundColor: C.bg, borderBottomColor: C.border }]}>
+      <View style={[styles.header, { backgroundColor: resolvedBg, borderBottomColor: C.border }]}>
         <TouchableOpacity onPress={() => setSidebarOpen(true)}>
           <Text style={[styles.menuButton, { color: C.text }]}>☰</Text>
         </TouchableOpacity>
