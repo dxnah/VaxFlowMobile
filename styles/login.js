@@ -1,211 +1,66 @@
-// login.js - Styles for the Login screen
+import { Platform, StyleSheet } from 'react-native';
 
-import { StyleSheet, Dimensions } from 'react-native';
-import { colors } from './colors';
-
-const { width } = Dimensions.get('window');
-const isSmall   = width < 360;
+const TEAL      = '#2BAF9E';
+const TEAL_DARK = '#1b7b6b';
 
 export default StyleSheet.create({
+  // Root
+  container:       { flex: 1, backgroundColor: '#f0faf9' },
+  scroll:          { flexGrow: 1 },
 
-  // ── Screen ──
-  container: {
-    flex: 1,
-    backgroundColor: '#e6f4f1',
-  },
-  scroll: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: isSmall ? 16 : 20,
-  },
+  // Top decorative band
+  topBand:         { height: 8, backgroundColor: TEAL },
+  topBandInner:    { height: 4, backgroundColor: TEAL_DARK, opacity: 0.4 },
 
-  // ── Card ──
-  card: {
-    backgroundColor: colors.white,
-    padding: isSmall ? 20 : 32,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 4,
-    width: '100%',
-  },
+  // Branding
+  brandSection:    { alignItems: 'center', paddingTop: 36, paddingBottom: 24 },
+  logoCircle:      { width: 84, height: 84, borderRadius: 42, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', shadowColor: TEAL, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 10, elevation: 6, marginBottom: 12 },
+  logo:            { width: 56, height: 56 },
+  appName:         { fontSize: 28, fontWeight: '800', color: TEAL_DARK, letterSpacing: 0.5 },
+  appTagline:      { fontSize: 12, color: '#7aada8', marginTop: 3, fontWeight: '500' },
 
-  // ── Logo Section ──
-  logoSection: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-    marginBottom: 24,
-  },
-  logo: {
-    width: isSmall ? 55 : 70,
-    height: isSmall ? 55 : 70,
-    flexShrink: 0,
-  },
-  titleSection: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  systemTitle: {
-    fontSize: isSmall ? 16 : 20,
-    fontWeight: '600',
-    color: colors.textDark,
-    marginBottom: 4,
-  },
-  systemSubtitle: {
-    fontSize: isSmall ? 10 : 12,
-    color: colors.textLight,
-    lineHeight: 16,
-  },
+  // Login card
+  card:            { marginHorizontal: 20, marginBottom: 32, backgroundColor: '#fff', borderRadius: 20, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 16, elevation: 5 },
+  loginHeading:    { fontSize: 22, fontWeight: '800', color: '#1a2e2c', marginBottom: 4 },
+  loginSubheading: { fontSize: 13, color: '#7aada8', marginBottom: 20 },
 
-  // ── Heading ──
-  loginHeading: {
-    fontSize: isSmall ? 16 : 18,
-    fontWeight: '600',
-    color: '#333',
-    letterSpacing: 1,
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  loginSubheading: {
-    fontSize: isSmall ? 11 : 12,
-    color: colors.textLight,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
+  // Error
+  errorBox:        { flexDirection: 'row', alignItems: 'center', backgroundColor: '#ffebee', borderRadius: 8, padding: 10, marginBottom: 16, borderLeftWidth: 3, borderLeftColor: '#e53935' },
+  errorText:       { fontSize: 13, color: '#c62828', flex: 1 },
 
-  // ── Error ──
-  errorBox: {
-    backgroundColor: '#ffeeee',
-    padding: 10,
-    borderRadius: 6,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: '#ffcccc',
-  },
-  errorText: {
-    color: '#cc3333',
-    fontSize: 13,
-    textAlign: 'center',
-  },
+  // Inputs
+  inputGroup:      { marginBottom: 14 },
+  inputLabel:      { fontSize: 12, fontWeight: '700', color: '#555', marginBottom: 6, letterSpacing: 0.3 },
+  inputRow:        { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f7f9fc', borderRadius: 12, borderWidth: 1.5, borderColor: '#e0e0e0', paddingHorizontal: 12, paddingVertical: 2 },
+  inputRowFocused: { borderColor: TEAL, backgroundColor: '#f0faf9' },
+  inputIcon:       { marginRight: 8 },
+  inputField:      { flex: 1, fontSize: 14, color: '#333', paddingVertical: 12 },
+  eyeBtn:          { padding: 4 },
 
-  // ── Inputs ──
-  inputContainer: {
-    marginBottom: isSmall ? 14 : 20,
-    textAlign: 'left',
-  },
-  inputLabel: {
-    fontWeight: '600',
-    marginBottom: 8,
-    color: '#333',
-    fontSize: isSmall ? 13 : 14,
-  },
-  inputField: {
-    borderWidth: 2,
-    borderColor: '#e0e0e0',
-    borderRadius: 6,
-    padding: isSmall ? 10 : 12,
-    fontSize: isSmall ? 13 : 14,
-    color: colors.textDark,
-    backgroundColor: '#fafafa',
-  },
+  forgotRow:       { alignSelf: 'flex-end', marginBottom: 20 },
+  forgotText:      { fontSize: 12, color: TEAL, fontWeight: '600' },
 
-  // ── Password ──
-  passwordWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#e0e0e0',
-    borderRadius: 6,
-    backgroundColor: '#fafafa',
-  },
-  passwordField: {
-    flex: 1,
-    padding: isSmall ? 10 : 12,
-    fontSize: isSmall ? 13 : 14,
-    color: colors.textDark,
-  },
-  eyeBtn: {
-    padding: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  eyeIconSvg: {
-    color: '#aaa',
-  },
+  // Login button
+  loginButton:     { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: TEAL, borderRadius: 12, paddingVertical: 14, marginBottom: 12, shadowColor: TEAL, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 4 },
+  loginButtonText: { fontSize: 16, fontWeight: '800', color: '#fff' },
 
-  // ── Login Button ──
-  loginButton: {
-    backgroundColor: '#24886E',
-    padding: isSmall ? 12 : 14,
-    borderRadius: 6,
-    alignItems: 'center',
-    marginBottom: isSmall ? 12 : 15,
-    shadowColor: '#24886E',
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  loginButtonText: {
-    color: colors.white,
-    fontWeight: '600',
-    fontSize: isSmall ? 14 : 16,
-  },
+  // Simulate button
+  simulateBtn:     { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: TEAL_DARK, borderRadius: 12, paddingVertical: 11, marginBottom: 20 },
+  simulateBtnText: { fontSize: 13, color: TEAL_DARK, fontWeight: '700' },
 
-  // ── Demo Box ──
-  demoBox: {
-    backgroundColor: '#f0faf8',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: '#b2dfdb',
-  },
-  demoTitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.primary,
-    marginBottom: 4,
-  },
-  demoText: {
-    fontSize: 12,
-    color: colors.textMid,
-  },
+  // Divider
+  dividerRow:      { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
+  dividerLine:     { flex: 1, height: 1, backgroundColor: '#eee' },
+  dividerText:     { fontSize: 11, color: '#bbb', marginHorizontal: 10, fontWeight: '600', letterSpacing: 1 },
 
-  // ── Simulate Button ──
-  simulateBtn: {
-  backgroundColor: 'transparent',
-  borderWidth: 1.5,
-  borderColor: '#24886E',
-  borderRadius: 6,
-  padding: 12,
-  alignItems: 'center',
-  marginBottom: 14,
-},
-simulateBtnText: {
-  color: '#24886E',
-  fontWeight: '600',
-  fontSize: 14,
-},
+  // Demo box
+  demoBox:         { backgroundColor: '#f7f9fc', borderRadius: 10, padding: 12, marginBottom: 20, borderWidth: 1, borderColor: '#eee' },
+  demoTitle:       { fontSize: 11, fontWeight: '700', color: '#999', marginBottom: 6, letterSpacing: 0.5 },
+  demoRow:         { flexDirection: 'row', alignItems: 'center', marginBottom: 3 },
+  demoText:        { fontSize: 12, color: '#777', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
 
-  // ── Auth Links ──
-  authLinks: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 2,
-    marginTop: 4,
-  },
-  authLink: {
-    color: colors.textLight,
-    fontSize: isSmall ? 12 : 14,
-    textAlign: 'center',
-  },
-  authLinkBold: {
-    color: '#24886E',
-    fontSize: isSmall ? 12 : 14,
-    fontWeight: '600',
-  },
+  // Auth links
+  authLinks:       { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+  authLink:        { fontSize: 13, color: '#999' },
+  authLinkBold:    { fontSize: 13, color: TEAL, fontWeight: '800' },
 });

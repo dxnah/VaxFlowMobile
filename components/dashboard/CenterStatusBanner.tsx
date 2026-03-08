@@ -1,5 +1,7 @@
+// components/dashboard/CenterStatusBanner.tsx
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
+import styles from '../../styles/CenterStatusBanner';
 
 interface OperatingHours {
   open: number;
@@ -17,15 +19,14 @@ export default function CenterStatusBanner() {
   const [status, setStatus] = useState('');
   const [statusColor, setStatusColor] = useState('#4caf50');
 
-  // Operating hours with cut-off and lunch break
   const operatingHours: OperatingSchedule = {
-    0: 'closed', // Sunday
-    1: { open: 8, cutoff: 9.5, lunchStart: 11.5, lunchEnd: 13, close: 17 }, // Monday
-    2: { open: 8, cutoff: 9.5, lunchStart: 11.5, lunchEnd: 13, close: 17 }, // Tuesday
-    3: { open: 8, cutoff: 9.5, lunchStart: 11.5, lunchEnd: 13, close: 17 }, // Wednesday
-    4: { open: 8, cutoff: 9.5, lunchStart: 11.5, lunchEnd: 13, close: 17 }, // Thursday
-    5: { open: 8, cutoff: 9.5, lunchStart: 11.5, lunchEnd: 13, close: 17 }, // Friday
-    6: { open: 8, cutoff: 9.5, lunchStart: 11.5, lunchEnd: 13, close: 12 }, // Saturday
+    0: 'closed',
+    1: { open: 8, cutoff: 9.5, lunchStart: 11.5, lunchEnd: 13, close: 17 },
+    2: { open: 8, cutoff: 9.5, lunchStart: 11.5, lunchEnd: 13, close: 17 },
+    3: { open: 8, cutoff: 9.5, lunchStart: 11.5, lunchEnd: 13, close: 17 },
+    4: { open: 8, cutoff: 9.5, lunchStart: 11.5, lunchEnd: 13, close: 17 },
+    5: { open: 8, cutoff: 9.5, lunchStart: 11.5, lunchEnd: 13, close: 17 },
+    6: { open: 8, cutoff: 9.5, lunchStart: 11.5, lunchEnd: 13, close: 12 },
   };
 
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -52,7 +53,6 @@ export default function CenterStatusBanner() {
       const todayHours = operatingHours[dayOfWeek];
 
       if (todayHours === 'closed') {
-        // Find next opening day
         let nextOpenDay = (dayOfWeek + 1) % 7;
         let daysUntilOpen = 1;
         while (operatingHours[nextOpenDay] === 'closed') {
@@ -69,33 +69,21 @@ export default function CenterStatusBanner() {
         }
         setStatusColor('#f44336');
       } else if (currentTime < todayHours.open) {
-        // Before opening time
         setStatus(`⏰ NOT OPEN YET • Opens at ${formatTime(todayHours.open)}`);
         setStatusColor('#ff9800');
       } else if (currentTime >= todayHours.lunchStart && currentTime < todayHours.lunchEnd) {
-        // During lunch break
-        setStatus(
-          `🍽️ LUNCH BREAK • Operations paused (resumes at ${formatTime(todayHours.lunchEnd)})`
-        );
+        setStatus(`🍽️ LUNCH BREAK • Operations paused (resumes at ${formatTime(todayHours.lunchEnd)})`);
         setStatusColor('#2196f3');
       } else if (currentTime >= todayHours.open && currentTime < todayHours.cutoff) {
-        // Between opening and cut-off (accepting patients)
         setStatus(`✅ ACCEPTING PATIENTS • Cut-off at ${formatTime(todayHours.cutoff)}`);
         setStatusColor('#4caf50');
       } else if (currentTime >= todayHours.cutoff && currentTime < todayHours.lunchStart) {
-        // After cut-off but before lunch
-        setStatus(
-          `⚠️ NOT ACCEPTING NEW PATIENTS • Serving existing patients (lunch at ${formatTime(todayHours.lunchStart)})`
-        );
+        setStatus(`⚠️ NOT ACCEPTING NEW PATIENTS • Serving existing patients (lunch at ${formatTime(todayHours.lunchStart)})`);
         setStatusColor('#ff9800');
       } else if (currentTime >= todayHours.lunchEnd && currentTime < todayHours.close) {
-        // After lunch but before closing
-        setStatus(
-          `✅ OPEN FOR FOLLOW-UP VISITS • (closes at ${formatTime(todayHours.close)})`
-        );
+        setStatus(`✅ OPEN FOR FOLLOW-UP VISITS • (closes at ${formatTime(todayHours.close)})`);
         setStatusColor('#4caf50');
       } else {
-        // After closing time
         let nextOpenDay = (dayOfWeek + 1) % 7;
         let daysUntilOpen = 1;
         while (operatingHours[nextOpenDay] === 'closed') {
@@ -115,7 +103,7 @@ export default function CenterStatusBanner() {
     };
 
     updateStatus();
-    const interval = setInterval(updateStatus, 60000); // Update every minute
+    const interval = setInterval(updateStatus, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -125,17 +113,3 @@ export default function CenterStatusBanner() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  banner: {
-    borderLeftWidth: 4,
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 14,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-});

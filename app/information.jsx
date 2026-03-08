@@ -1,11 +1,10 @@
 // app/information.jsx
 
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Platform, StatusBar, StyleSheet } from 'react-native';
+import { ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import SharedHeader from '../components/SharedHeader';
 import { useUser } from '../context/UserContext';
-
-const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) : 0;
+import styles from '../styles/Information';
 
 const VACCINES = [
   { id: 1, name: 'Anti-Rabies Vaccine (ARV)', emoji: '💉', color: '#e53935', bgLight: '#ffebee', bgDark: '#2d1a1a', disease: 'Rabies infection caused by bites or scratches from infected animals (dogs, cats, etc.)', age: 'All ages — children and adults exposed to animal bites', doses: '3–4 doses depending on treatment protocol', sideEffects: ['Pain or redness at the injection site', 'Fever', 'Headache', 'Nausea'] },
@@ -26,6 +25,7 @@ function VaccineCard({ vaccine, dark }) {
     border: dark ? '#2e3837' : '#f0f0f0',
     tagBg:  dark ? vaccine.bgDark : vaccine.bgLight,
   };
+
   return (
     <TouchableOpacity activeOpacity={0.92} onPress={() => setExpanded(e => !e)} style={[styles.card, { backgroundColor: C.card, borderColor: C.border, shadowColor: vaccine.color }]}>
       <View style={[styles.cardAccent, { backgroundColor: vaccine.color }]} />
@@ -43,18 +43,25 @@ function VaccineCard({ vaccine, dark }) {
           <Text style={{ color: expanded ? vaccine.color : C.sub, fontSize: 12, fontWeight: '700' }}>{expanded ? '▲' : '▼'}</Text>
         </View>
       </View>
+
       {expanded && (
         <View style={[styles.cardBody, { borderTopColor: C.border }]}>
           <View style={styles.detailRow}>
-            <View style={[styles.detailLabel, { backgroundColor: dark ? vaccine.bgDark : vaccine.bgLight }]}><Text style={[styles.detailLabelText, { color: vaccine.color }]}>🦠 DISEASE</Text></View>
+            <View style={[styles.detailLabel, { backgroundColor: dark ? vaccine.bgDark : vaccine.bgLight }]}>
+              <Text style={[styles.detailLabelText, { color: vaccine.color }]}>🦠 DISEASE</Text>
+            </View>
             <Text style={[styles.detailValue, { color: C.text }]}>{vaccine.disease}</Text>
           </View>
           <View style={styles.detailRow}>
-            <View style={[styles.detailLabel, { backgroundColor: dark ? '#1e2928' : '#f0faf9' }]}><Text style={[styles.detailLabelText, { color: '#1b7b6b' }]}>👶 AGE</Text></View>
+            <View style={[styles.detailLabel, { backgroundColor: dark ? '#1e2928' : '#f0faf9' }]}>
+              <Text style={[styles.detailLabelText, { color: '#1b7b6b' }]}>👶 AGE</Text>
+            </View>
             <Text style={[styles.detailValue, { color: C.text }]}>{vaccine.age}</Text>
           </View>
           <View style={styles.detailRow}>
-            <View style={[styles.detailLabel, { backgroundColor: dark ? '#1e2d3d' : '#e3f2fd' }]}><Text style={[styles.detailLabelText, { color: '#1565c0' }]}>💉 DOSES</Text></View>
+            <View style={[styles.detailLabel, { backgroundColor: dark ? '#1e2d3d' : '#e3f2fd' }]}>
+              <Text style={[styles.detailLabelText, { color: '#1565c0' }]}>💉 DOSES</Text>
+            </View>
             <Text style={[styles.detailValue, { color: C.text }]}>{vaccine.doses}</Text>
           </View>
           <View style={[styles.sideEffectsBox, { backgroundColor: dark ? '#1e2928' : '#fafafa', borderColor: C.border }]}>
@@ -86,7 +93,9 @@ export default function InformationScreen() {
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={[styles.introBanner, { backgroundColor: dark ? '#1e3330' : '#e0f7f4', borderColor: dark ? '#2e4a46' : '#b2dfdb' }]}>
-          <Text style={[styles.introText, { color: dark ? '#7aada8' : '#1b7b6b' }]}>Tap any vaccine card to view full details including disease, recommended age, number of doses, and possible side effects.</Text>
+          <Text style={[styles.introText, { color: dark ? '#7aada8' : '#1b7b6b' }]}>
+            Tap any vaccine card to view full details including disease, recommended age, number of doses, and possible side effects.
+          </Text>
         </View>
         <View style={styles.countRow}>
           <Text style={[styles.countLabel, { color: dark ? '#7aada8' : '#6b7280' }]}>AVAILABLE VACCINES</Text>
@@ -100,33 +109,3 @@ export default function InformationScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  root: { flex: 1 },
-  statusBarSpacer: { height: STATUS_BAR_HEIGHT },
-  scrollContent: { paddingHorizontal: 14, paddingTop: 12 },
-  introBanner: { borderWidth: 1, borderRadius: 12, padding: 12, marginBottom: 16 },
-  introText: { fontSize: 13, lineHeight: 20 },
-  countRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingHorizontal: 2 },
-  countLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1 },
-  countBadge: { width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
-  countNum: { color: '#fff', fontSize: 13, fontWeight: '700' },
-  card: { borderRadius: 14, borderWidth: 1, marginBottom: 12, overflow: 'hidden', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 6, elevation: 3 },
-  cardAccent: { height: 4, width: '100%' },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 12 },
-  iconCircle: { width: 46, height: 46, borderRadius: 23, justifyContent: 'center', alignItems: 'center' },
-  vaccineName: { fontSize: 13, fontWeight: '700', marginBottom: 5, lineHeight: 18 },
-  diseaseTag: { alignSelf: 'flex-start', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 },
-  diseaseTagText: { fontSize: 11, fontWeight: '600' },
-  chevron: { width: 28, height: 28, borderRadius: 8, borderWidth: 1.5, justifyContent: 'center', alignItems: 'center' },
-  cardBody: { borderTopWidth: 1, padding: 14, paddingTop: 12, gap: 10 },
-  detailRow: { gap: 5 },
-  detailLabel: { alignSelf: 'flex-start', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, marginBottom: 2 },
-  detailLabelText: { fontSize: 10, fontWeight: '800', letterSpacing: 0.8 },
-  detailValue: { fontSize: 13, lineHeight: 20 },
-  sideEffectsBox: { borderWidth: 1, borderRadius: 10, padding: 12, marginTop: 4 },
-  sideEffectsTitle: { fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 8 },
-  sideEffectRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 5 },
-  dot: { width: 6, height: 6, borderRadius: 3, marginTop: 6 },
-  sideEffectText: { fontSize: 13, flex: 1, lineHeight: 20 },
-});
