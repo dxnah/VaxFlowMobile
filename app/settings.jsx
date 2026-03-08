@@ -129,8 +129,6 @@ export default function SettingsScreen() {
     <>
       <StatusBar backgroundColor={C.topBar} barStyle="light-content" translucent={false} />
       <SafeAreaView style={[styles.root, { backgroundColor: C.bg }]} edges={['top', 'left', 'right']}>
-        <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-
           {/* Top Bar */}
           <View style={{ backgroundColor: C.topBar, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14, flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity onPress={() => router.back()} style={{ backgroundColor: C.topBarBtn, borderRadius: 10, width: 36, height: 36, justifyContent: 'center', alignItems: 'center' }} activeOpacity={0.7}>
@@ -141,7 +139,9 @@ export default function SettingsScreen() {
               <Text style={{ color: C.topBarSub, fontSize: 12 }}>Manage your account preferences</Text>
             </View>
             <View style={{ width: 36, height: 36 }} />
-          </View>
+          </View>    
+            
+          <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           
           {/* Avatar */}
           <View style={[styles.avatarSection, { backgroundColor: C.card, borderBottomColor: C.border }]}>

@@ -6,6 +6,7 @@ import { Alert, Image, Modal, ScrollView, StatusBar, Text, TouchableOpacity, Vie
 import SharedHeader from '../components/SharedHeader';
 import { useUser } from '../context/UserContext';
 import styles from '../styles/History';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const INITIAL_RECORDS = [
   { id: 1, vaccine: 'Anti-Rabies Vaccine (ARV)', dose: '1st Dose', date: 'January 15, 2025', facility: 'ABTC - City Health Office', administered: 'Dr. Santos', color: '#e53935', cardImage: null },
@@ -144,7 +145,7 @@ export default function HistoryScreen() {
   const totalVaccines = [...new Set(records.map(r => r.vaccine))].length;
 
   return (
-    <View style={[styles.root, { backgroundColor: C.bg }]}>
+    <SafeAreaView style={[styles.root, { backgroundColor: C.topBar }]} edges={['top', 'left', 'right']}>
 
       <SharedHeader title="💉 Vaccination History" subtitle="Your digital vaccination records" />
 
@@ -205,6 +206,6 @@ export default function HistoryScreen() {
           <Text style={styles.modalCaption}>{viewingImage?.vaccine} — {viewingImage?.dose}</Text>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }

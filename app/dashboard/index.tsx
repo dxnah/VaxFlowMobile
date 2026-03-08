@@ -20,6 +20,7 @@ import CenterStatusBanner from '../../components/dashboard/CenterStatusBanner';
 import Reminders from '../../components/dashboard/Reminders';
 import VaccineList from '../../components/dashboard/VaccineList';
 import { useUser } from '../../context/UserContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const STATUS_BAR_HEIGHT =
   Platform.OS === "android" ? (StatusBar.currentHeight ?? 24) : 0;
@@ -62,7 +63,7 @@ export default function DashboardScreen() {
   };
 
   return (
-    <View style={[styles.root, { backgroundColor: C.bg }]}>
+    <SafeAreaView style={[styles.root, { backgroundColor: C.bg }]} edges={['top', 'left', 'right']}>
       <StatusBar translucent={false} backgroundColor={dark ? '#1a2e2c' : '#2BAF9E'} barStyle="light-content" />
 
       {sidebarOpen && (
@@ -170,7 +171,7 @@ export default function DashboardScreen() {
           <Text style={[styles.footerSubtext, { color: C.sub }]}>City Health Office • Cagayan de Oro City, Misamis Oriental</Text>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

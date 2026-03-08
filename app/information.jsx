@@ -5,6 +5,7 @@ import { ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-nativ
 import SharedHeader from '../components/SharedHeader';
 import { useUser } from '../context/UserContext';
 import styles from '../styles/Information';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const VACCINES = [
   { id: 1, name: 'Anti-Rabies Vaccine (ARV)', emoji: '💉', color: '#e53935', bgLight: '#ffebee', bgDark: '#2d1a1a', disease: 'Rabies infection caused by bites or scratches from infected animals (dogs, cats, etc.)', age: 'All ages — children and adults exposed to animal bites', doses: '3–4 doses depending on treatment protocol', sideEffects: ['Pain or redness at the injection site', 'Fever', 'Headache', 'Nausea'] },
@@ -85,7 +86,7 @@ export default function InformationScreen() {
   const topBar = dark ? '#1a2e2c' : '#2BAF9E';
 
   return (
-    <View style={[styles.root, { backgroundColor: dark ? '#1a1f1e' : '#EEF7F6' }]}>
+    <SafeAreaView style={[styles.root, { backgroundColor: dark ? '#1a1f1e' : '#EEF7F6' }]} edges={['top', 'left', 'right']}>
 
       <SharedHeader title="💊 Vaccine Information" subtitle="Details about each available vaccine" />
 
@@ -104,6 +105,6 @@ export default function InformationScreen() {
         {VACCINES.map(v => <VaccineCard key={v.id} vaccine={v} dark={dark} />)}
         <View style={{ height: 30 }} />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
