@@ -1,11 +1,19 @@
+// components/dashboard/DoseSchedule.jsx
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
+import styles from '../../styles/DoseSchedule';
+
+const ScheduleItem = ({ dose, day, time }) => (
+  <Text style={styles.item}>
+    <Text style={styles.bold}>{dose}:</Text> {day} {time || ''}
+  </Text>
+);
 
 export default function DoseSchedule() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>ℹ️ Anti-Rabies Vaccination Schedule</Text>
-      
+
       <View style={styles.infoBox}>
         <Text style={styles.desc}>
           Standard anti-rabies protocol requires 5 doses:
@@ -26,52 +34,3 @@ export default function DoseSchedule() {
     </View>
   );
 }
-
-const ScheduleItem = ({ dose, day, time }) => (
-  <Text style={styles.item}>
-    <Text style={styles.bold}>{dose}:</Text> {day} {time || ''}
-  </Text>
-);
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  infoBox: {
-    backgroundColor: '#f5f5f5',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-  },
-  desc: {
-    fontSize: 12,
-    color: '#555',
-    marginBottom: 10,
-    lineHeight: 18,
-  },
-  scheduleList: {
-    marginVertical: 10,
-  },
-  item: {
-    fontSize: 12,
-    color: '#333',
-    marginBottom: 6,
-    lineHeight: 18,
-  },
-  bold: {
-    fontWeight: 'bold',
-  },
-  important: {
-    fontSize: 11,
-    color: '#666',
-    fontStyle: 'italic',
-    marginTop: 10,
-    lineHeight: 16,
-  },
-});
