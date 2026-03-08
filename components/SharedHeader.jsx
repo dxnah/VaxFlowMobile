@@ -1,25 +1,25 @@
 // components/SharedHeader.jsx
-// Reusable header + sidebar for all pages
+
 import React, { useState } from 'react';
 import {
   View, Text, Image, TouchableOpacity,
-  Modal, Dimensions, StyleSheet, Platform, StatusBar
+  Modal, Dimensions, StyleSheet, StatusBar
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useUser } from '../context/UserContext';
 
-export default function SharedHeader({ title, subtitle }) {
+export default function SharedHeader({ title, subtitle, headerBg = '#ffffff' }) {
   const router = useRouter();
   const { username, darkMode, avatarUri } = useUser();
   const dark = darkMode;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const C = {
-    topBar:   dark ? '#1a2e2c' : '#2BAF9E',
-    topText:  '#ffffff',
-    topSub:   'rgba(255,255,255,0.75)',
-    topBtn:   dark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.2)',
-    sidebar:  '#1b7b6b',
+    bg:       headerBg ?? (dark ? '#242b2a' : '#ffffff'),
+    text:     dark ? '#e8f0ef' : '#333333',
+    sub:      dark ? '#7aada8' : '#999999',
+    border:   dark ? '#2e3837' : '#e0e0e0',
+    sidebar:  '#26a69a',
   };
 
   const handleLogout = () => {
@@ -51,7 +51,7 @@ export default function SharedHeader({ title, subtitle }) {
             <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/dashboard'); }}>
               <Text style={styles.sidebarItemText}>📊 Dashboard</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/dashboard/schedule'); }}>
+            <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/schedule'); }}>
               <Text style={styles.sidebarItemText}>📅 Patient Schedule</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/information'); }}>
@@ -71,31 +71,39 @@ export default function SharedHeader({ title, subtitle }) {
         </View>
       </Modal>
 
-      {/* Top Bar */}
-      <View style={[styles.topBar, { backgroundColor: C.topBar }]}>
-        <TouchableOpacity onPress={() => setSidebarOpen(true)} style={[styles.menuBtn, { backgroundColor: C.topBtn }]} activeOpacity={0.7}>
-          <Text style={{ color: C.topText, fontSize: 18, fontWeight: '700' }}>☰</Text>
+      {/* Transparent status bar */}
+      <StatusBar backgroundColor="transparent" barStyle="dark-content" translucent={true} />
+
+      {/* Header Bar */}
+      <View style={[styles.header, { backgroundColor: C.bg, borderBottomColor: C.border }]}>
+        <TouchableOpacity onPress={() => setSidebarOpen(true)}>
+          <Text style={[styles.menuButton, { color: C.text }]}>☰</Text>
         </TouchableOpacity>
-        <View style={{ flex: 1 }}>
-          <Text style={[styles.topTitle, { color: C.topText }]}>{title}</Text>
-          {subtitle ? <Text style={[styles.topSub, { color: C.topSub }]}>{subtitle}</Text> : null}
+
+        <View style={styles.headerCenter}>
+          <Text style={[styles.headerTitle, { color: C.text }]} numberOfLines={1}>{title}</Text>
+          {subtitle && <Text style={[styles.headerSubtitle, { color: C.sub }]} numberOfLines={1}>{subtitle}</Text>}
         </View>
+
         <TouchableOpacity onPress={() => router.push('/settings')} activeOpacity={0.8}>
-          {avatarUri ? (
-            <Image source={{ uri: avatarUri }} style={styles.topAvatar} />
-          ) : (
-            <View style={[styles.topAvatarPlaceholder, { backgroundColor: C.topBtn }]}>
-              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>{username.charAt(0).toUpperCase()}</Text>
-            </View>
-          )}
+          <View style={styles.avatarContainer}>
+            {avatarUri ? (
+              <Image source={{ uri: avatarUri }} style={styles.avatarImage} />
+            ) : (
+              <View style={styles.avatarFallback}>
+                <Text style={styles.avatarLetter}>{username.charAt(0).toUpperCase()}</Text>
+              </View>
+            )}
+          </View>
         </TouchableOpacity>
       </View>
     </>
   );
 }
 
+const AVATAR_SIZE = 36;
+
 const styles = StyleSheet.create({
-  // Sidebar
   sidebarContainer: { flex: 1, flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.5)' },
   sidebar: { width: Dimensions.get('window').width * 0.75, paddingTop: 50, paddingHorizontal: 16, height: '100%' },
   sidebarOverlay: { flex: 1 },
@@ -110,11 +118,34 @@ const styles = StyleSheet.create({
   logoutItem: { marginTop: 20, backgroundColor: '#ff6b6b' },
   logoutItemText: { fontSize: 14, color: '#fff', fontWeight: '600' },
 
-  // Top bar
-  topBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14, gap: 12 },
-  menuBtn: { width: 36, height: 36, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
-  topTitle: { fontSize: 17, fontWeight: '700' },
-  topSub: { fontSize: 12, marginTop: 1 },
-  topAvatar: { width: 34, height: 34, borderRadius: 17, borderWidth: 2, borderColor: 'rgba(255,255,255,0.4)' },
-  topAvatarPlaceholder: { width: 34, height: 34, borderRadius: 17, justifyContent: 'center', alignItems: 'center' },
+  header: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  menuButton: { fontSize: 28, fontWeight: 'bold' },
+  headerCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  headerTitle: { fontSize: 16, fontWeight: 'bold', textAlign: 'center' },
+  headerSubtitle: { fontSize: 12, marginTop: 3, textAlign: 'center' },
+
+  avatarContainer: {
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
+    borderRadius: AVATAR_SIZE / 2,
+    borderWidth: 2,
+    borderColor: '#1b7b6b',
+    overflow: 'hidden',
+  },
+  avatarImage: { width: '100%', height: '100%' },
+  avatarFallback: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#E8F7F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarLetter: { fontSize: 16, color: '#1b7b6b', fontWeight: '700' },
 });
