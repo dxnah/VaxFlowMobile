@@ -1,12 +1,11 @@
 // app/history.jsx
 
 import * as ImagePicker from 'expo-image-picker';
-import React, { useState } from 'react';
+import { default as React, default as React, useState } from 'react';
 import { Alert, Image, Modal, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import SharedHeader from '../components/SharedHeader';
 import { useUser } from '../context/UserContext';
 import styles from '../styles/History';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const INITIAL_RECORDS = [
   { id: 1, vaccine: 'Anti-Rabies Vaccine (ARV)', dose: '1st Dose', date: 'January 15, 2025', facility: 'ABTC - City Health Office', administered: 'Dr. Santos', color: '#e53935', cardImage: null },
