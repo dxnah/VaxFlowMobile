@@ -145,7 +145,7 @@ export default function HistoryScreen() {
   const totalVaccines = [...new Set(records.map(r => r.vaccine))].length;
 
   return (
-    <SafeAreaView style={[styles.root, { backgroundColor: C.topBar }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={[styles.root, { backgroundColor: C.bg }]} edges={['top', 'left', 'right']}>
 
       <SharedHeader title="💉 Vaccination History" subtitle="Your digital vaccination records" />
 
