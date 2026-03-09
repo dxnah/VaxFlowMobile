@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import SharedHeader from '../components/SharedHeader';
 import { useUser } from '../context/UserContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Dose {
   id: number;
@@ -102,9 +103,7 @@ export default function PatientScheduleScreen() {
   const prevMonth = () => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1));
 
   return (
-    <View style={[styles.root, { backgroundColor: C.topBar }]}>
-      <StatusBar backgroundColor={C.topBar} barStyle="light-content" translucent={false} />
-      <View style={[styles.statusBarSpacer, { backgroundColor: C.topBar }]} />
+    <SafeAreaView style={[styles.root, { backgroundColor: C.bg }]} edges={['top', 'left', 'right']}>
 
       <SharedHeader title="📅 Patient Schedule" subtitle="Track your vaccination doses" />
 
@@ -283,7 +282,7 @@ export default function PatientScheduleScreen() {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
