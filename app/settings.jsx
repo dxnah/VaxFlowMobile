@@ -3,10 +3,19 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Image, Platform, ScrollView, StatusBar, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { default as React, default as React, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Platform,
+  ScrollView,
+  StatusBar,
+  Switch,
+  Text, TextInput, TouchableOpacity,
+  View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import SharedHeader from '../components/SharedHeader';
 import { useUser } from '../context/UserContext';
 import styles from '../styles/Settings';
 
@@ -139,10 +148,9 @@ export default function SettingsScreen() {
               <Text style={{ color: C.topBarSub, fontSize: 12 }}>Manage your account preferences</Text>
             </View>
             <View style={{ width: 36, height: 36 }} />
-          </View>    
-            
-          <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-          
+          </View>
+>>>>>>> 7c9b883d5cecbdaab524440d6143cd31dad0d1b2
+
           {/* Avatar */}
           <View style={[styles.avatarSection, { backgroundColor: C.card, borderBottomColor: C.border }]}>
             <TouchableOpacity onPress={pickImage} activeOpacity={0.85}>
