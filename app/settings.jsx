@@ -149,7 +149,6 @@ export default function SettingsScreen() {
             </View>
             <View style={{ width: 36, height: 36 }} />
           </View>
->>>>>>> 7c9b883d5cecbdaab524440d6143cd31dad0d1b2
 
           {/* Avatar */}
           <View style={[styles.avatarSection, { backgroundColor: C.card, borderBottomColor: C.border }]}>
@@ -255,7 +254,7 @@ export default function SettingsScreen() {
           </View>
 
           <View style={{ height: 40 }} />
-        </ScrollView>
+        
       </SafeAreaView>
     </>
   );
