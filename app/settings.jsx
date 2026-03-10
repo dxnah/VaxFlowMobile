@@ -3,13 +3,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { default as React, default as React, useState } from 'react';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   Image,
   Platform,
-  ScrollView,
   StatusBar,
   Switch,
   Text, TextInput, TouchableOpacity,

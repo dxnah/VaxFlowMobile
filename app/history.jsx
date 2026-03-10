@@ -1,8 +1,8 @@
 // app/history.jsx
 
 import * as ImagePicker from 'expo-image-picker';
-import { default as React, default as React, useState } from 'react';
-import { Alert, Image, Modal, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, Image, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import SharedHeader from '../components/SharedHeader';
 import { useUser } from '../context/UserContext';
 import styles from '../styles/History';
