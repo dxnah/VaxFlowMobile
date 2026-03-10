@@ -23,19 +23,13 @@ export default function VaccineList() {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: dark ? '#e8f0ef' : '#333' }]}>🏥 Other Vaccines Available</Text>
-
+      <Text style={[styles.title, { color: dark ? '#e8f0ef' : '#333' }]}>
+        💉 Vaccines Available at ABTC-CHO
+      </Text>
+  
       <Text style={[styles.category, { color: dark ? '#7aada8' : '#999' }]}>✓ IN STOCK</Text>
-      <VaccineCard name="BCG" doses={150} status="In Stock" color="#00897b" dark={dark} />
-      <VaccineCard name="DPT" doses={200} status="In Stock" color="#00897b" dark={dark} />
-
-      <Text style={[styles.category, { color: dark ? '#7aada8' : '#999' }]}>⚠ LOW STOCK</Text>
-      <VaccineCard name="Hepatitis B" doses={40} status="Low Stock" color="#ff9800" dark={dark} />
-      <VaccineCard name="MMR" doses={25} status="Low Stock" color="#ff9800" dark={dark} />
-
-      <Text style={[styles.category, { color: dark ? '#7aada8' : '#999' }]}>✗ UNAVAILABLE</Text>
-      <VaccineCard name="Polio (OPV)" doses={0} status="Out Stock" color="#f44336" restock="7 days" dark={dark} />
-      <VaccineCard name="Varicella" doses={0} status="Out Stock" color="#f44336" restock="7 days" dark={dark} />
+      <VaccineCard name="Anti-Rabies Vaccine (ARV)" doses={120} status="In Stock" color="#00897b" dark={dark} />
+      <VaccineCard name="ARV Booster Shot" doses={80} status="In Stock" color="#00897b" dark={dark} />
     </View>
   );
 }

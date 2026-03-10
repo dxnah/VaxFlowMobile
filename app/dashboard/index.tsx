@@ -3,24 +3,23 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Dimensions,
-    Image,
-    Modal,
-    Platform,
-    RefreshControl,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  Image,
+  Modal,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import Announcements from '../../components/dashboard/Announcements';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import CenterStatusBanner from '../../components/dashboard/CenterStatusBanner';
 import Reminders from '../../components/dashboard/Reminders';
 import VaccineList from '../../components/dashboard/VaccineList';
 import { useUser } from '../../context/UserContext';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const STATUS_BAR_HEIGHT =
   Platform.OS === "android" ? (StatusBar.currentHeight ?? 24) : 0;
@@ -152,7 +151,34 @@ export default function DashboardScreen() {
           </View>
 
           <CenterStatusBanner />
-          <Announcements isPeakSeason={[5, 6, 7].includes(new Date().getMonth())} capacityPercentage={0} />
+          {/* Operating Hours */}
+          <View style={[styles.seasonCard, { backgroundColor: dark ? '#1e2d3d' : '#e3f2fd', borderColor: '#2196f3' }]}>
+          <Text style={[styles.seasonLabel, { color: C.text }]}>🕐 Operating Hours</Text>
+          <Text style={[styles.dateText, { color: C.sub }]}>Monday – Friday  •  8:00 AM – 5:00 PM</Text>
+          <Text style={[styles.dateText, { color: C.sub }]}>Saturday  •  8:00 AM – 12:00 PM</Text>
+          <Text style={[styles.dateText, { color: C.sub }]}>Sunday  •  Closed</Text>
+        </View>
+
+          {/* What to Expect */}
+          <View style={[styles.seasonCard, { backgroundColor: dark ? '#1e3330' : '#e8f5e9', borderColor: '#43a047' }]}>
+  <Text style={[styles.seasonLabel, { color: C.text, textAlign: 'left', fontSize: 16, fontWeight: 'bold' }]}>📋 What to Expect</Text>
+
+  <Text style={[styles.dateText, { color: '#2BAF9E', fontWeight: 'bold', marginTop: 6, textAlign: 'left', fontSize: 13 }]}>🏥 First-Time Patients</Text>
+  <Text style={[styles.dateText, { color: dark ? '#b0bec5' : '#444444', textAlign: 'left', marginBottom: 4 }]}>• Arrive before 8:00 AM and line up at the ABTC-CHO entrance.</Text>
+  <Text style={[styles.dateText, { color: dark ? '#b0bec5' : '#444444', textAlign: 'left', marginBottom: 4 }]}>• Registration starts at 8:00 AM or 8:30 AM.</Text>
+  <Text style={[styles.dateText, { color: dark ? '#b0bec5' : '#444444', textAlign: 'left', marginBottom: 4 }]}>• After registration, you will be assessed and classified as either Category 2 or Category 3.</Text>
+
+  <Text style={[styles.dateText, { color: '#1e88e5', fontWeight: 'bold', marginTop: 8, textAlign: 'left', fontSize: 13 }]}>📌 Category 2 Patients</Text>
+  <Text style={[styles.dateText, { color: dark ? '#b0bec5' : '#444444', textAlign: 'left', marginBottom: 4 }]}>• Proceed to the front desk for a second verification. Your name will be queued for processing.</Text>
+  <Text style={[styles.dateText, { color: dark ? '#b0bec5' : '#444444', textAlign: 'left', marginBottom: 4 }]}>• You will be called to assist with your PhilHealth form (provided by ABTC-CHO). Submit the completed form and wait for it to be processed before your name is queued for vaccine administration.</Text>
+
+  <Text style={[styles.dateText, { color: '#f57c00', fontWeight: 'bold', marginTop: 8, textAlign: 'left', fontSize: 13 }]}>📌 Category 3 Patients</Text>
+  <Text style={[styles.dateText, { color: dark ? '#b0bec5' : '#444444', textAlign: 'left', marginBottom: 4 }]}>• You will be paired with another Category 3 patient to share the cost of one ARV vial. Purchase the vial and two syringes (per patient) from the nearest pharmacy — typically Mercury Drugstore.</Text>
+  <Text style={[styles.dateText, { color: dark ? '#b0bec5' : '#444444', textAlign: 'left', marginBottom: 4 }]}>• Return to the front desk, submit the purchased items, and both of your names will be queued for administration.</Text>
+
+  <Text style={[styles.dateText, { color: '#43a047', fontWeight: 'bold', marginTop: 8, textAlign: 'left', fontSize: 13 }]}>💉 Booster Shot Patients</Text>
+  <Text style={[styles.dateText, { color: dark ? '#b0bec5' : '#444444', textAlign: 'left', marginBottom: 4 }]}>• Please proceed to the registration area and bring your Vaccination Card for verification.</Text>
+</View>
           <Reminders />
 
           <View style={[styles.antiRabiesCard, dark && { backgroundColor: '#2d1a1a' }]}>
