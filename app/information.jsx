@@ -1,11 +1,11 @@
 // app/information.jsx
 
 import React, { useState } from 'react';
-import { ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import SharedHeader from '../components/SharedHeader';
 import { useUser } from '../context/UserContext';
 import styles from '../styles/Information';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const VACCINES = [
   { id: 1, name: 'Anti-Rabies Vaccine (ARV)', emoji: '💉', color: '#e53935', bgLight: '#ffebee', bgDark: '#2d1a1a', disease: 'Rabies infection caused by bites or scratches from infected animals (dogs, cats, etc.)', age: 'All ages — children and adults exposed to animal bites', doses: '3–4 doses depending on treatment protocol', sideEffects: ['Pain or redness at the injection site', 'Fever', 'Headache', 'Nausea'] },
@@ -83,28 +83,31 @@ function VaccineCard({ vaccine, dark }) {
 export default function InformationScreen() {
   const { darkMode } = useUser();
   const dark = darkMode;
-  const topBar = dark ? '#1a2e2c' : '#2BAF9E';
 
   return (
-    <SafeAreaView style={[styles.root, { backgroundColor: dark ? '#1a1f1e' : '#EEF7F6' }]} edges={['top', 'left', 'right']}>
+    // SafeAreaView bg = teal so the status bar inset area matches the header
+    <SafeAreaView style={[styles.root, { backgroundColor: dark ? '#1a2e2c' : '#2BAF9E' }]} edges={['top', 'left', 'right']}>
 
       <SharedHeader title="💊 Vaccine Information" subtitle="Details about each available vaccine" />
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={[styles.introBanner, { backgroundColor: dark ? '#1e3330' : '#e0f7f4', borderColor: dark ? '#2e4a46' : '#b2dfdb' }]}>
-          <Text style={[styles.introText, { color: dark ? '#7aada8' : '#1b7b6b' }]}>
-            Tap any vaccine card to view full details including disease, recommended age, number of doses, and possible side effects.
-          </Text>
-        </View>
-        <View style={styles.countRow}>
-          <Text style={[styles.countLabel, { color: dark ? '#7aada8' : '#6b7280' }]}>AVAILABLE VACCINES</Text>
-          <View style={[styles.countBadge, { backgroundColor: dark ? '#1b7b6b' : '#2BAF9E' }]}>
-            <Text style={styles.countNum}>{VACCINES.length}</Text>
+      {/* Inner view carries the actual page background color */}
+      <View style={{ flex: 1, backgroundColor: dark ? '#1a1f1e' : '#EEF7F6' }}>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <View style={[styles.introBanner, { backgroundColor: dark ? '#1e3330' : '#e0f7f4', borderColor: dark ? '#2e4a46' : '#b2dfdb' }]}>
+            <Text style={[styles.introText, { color: dark ? '#7aada8' : '#1b7b6b' }]}>
+              Tap any vaccine card to view full details including disease, recommended age, number of doses, and possible side effects.
+            </Text>
           </View>
-        </View>
-        {VACCINES.map(v => <VaccineCard key={v.id} vaccine={v} dark={dark} />)}
-        <View style={{ height: 30 }} />
-      </ScrollView>
+          <View style={styles.countRow}>
+            <Text style={[styles.countLabel, { color: dark ? '#7aada8' : '#6b7280' }]}>AVAILABLE VACCINES</Text>
+            <View style={[styles.countBadge, { backgroundColor: dark ? '#1b7b6b' : '#2BAF9E' }]}>
+              <Text style={styles.countNum}>{VACCINES.length}</Text>
+            </View>
+          </View>
+          {VACCINES.map(v => <VaccineCard key={v.id} vaccine={v} dark={dark} />)}
+          <View style={{ height: 30 }} />
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
