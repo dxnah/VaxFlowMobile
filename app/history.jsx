@@ -3,6 +3,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
 import { Alert, Image, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import SharedHeader from '../components/SharedHeader';
 import { useUser } from '../context/UserContext';
 import styles from '../styles/History';
@@ -144,10 +145,11 @@ export default function HistoryScreen() {
   const totalVaccines = [...new Set(records.map(r => r.vaccine))].length;
 
   return (
-    <SafeAreaView style={[styles.root, { backgroundColor: C.bg }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={[styles.root, { backgroundColor: dark ? '#1a2e2c' : '#2BAF9E' }]} edges={['top', 'left', 'right']}>
 
       <SharedHeader title="💉 Vaccination History" subtitle="Your digital vaccination records" />
 
+      <View style={{ flex: 1, backgroundColor: C.bg }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.statsRow}>
           {[
@@ -195,6 +197,8 @@ export default function HistoryScreen() {
         ))}
         <View style={{ height: 30 }} />
       </ScrollView>
+
+      </View>
 
       <Modal visible={!!viewingImage} transparent animationType="fade">
         <View style={styles.modalOverlay}>

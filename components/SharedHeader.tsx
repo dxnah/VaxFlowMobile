@@ -1,29 +1,33 @@
-// components/SharedHeader.jsx
+// components/SharedHeader.tsx
 
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View, Text, Image, TouchableOpacity,
-  Modal, Dimensions, StyleSheet, StatusBar
+  Dimensions,
+  Image,
+  Modal,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useUser } from '../context/UserContext';
 
+type Props = {
+  title: string;
+  subtitle?: string;
+};
 
-export default function SharedHeader({ title, subtitle, headerBg = undefined }) {
+export default function SharedHeader({ title, subtitle }: Props) {
   const router = useRouter();
   const { username, darkMode, avatarUri } = useUser();
   const dark = darkMode;
-  const statusBg = dark ? '#1a2e2c' : '#2BAF9E';
-  const resolvedBg = headerBg ?? (dark ? '#242b2a' : '#ffffff');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const C = {
-    bg:       headerBg ?? (dark ? '#242b2a' : '#ffffff'),
-    text: dark ? '#e8f0ef' : '#333333',
-    sub:      dark ? '#7aada8' : '#999999',
-    border:   dark ? '#2e3837' : '#e0e0e0',
-    sidebar:  '#26a69a',
-  };
+  const headerBg = dark ? '#1a2e2c' : '#2BAF9E';
+  const statusBg = dark ? '#1a2e2c' : '#2BAF9E';
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     setSidebarOpen(false);
@@ -35,7 +39,7 @@ export default function SharedHeader({ title, subtitle, headerBg = undefined }) 
       {/* Sidebar Modal */}
       <Modal visible={sidebarOpen} transparent animationType="fade">
         <View style={styles.sidebarContainer}>
-          <View style={[styles.sidebar, { backgroundColor: C.sidebar }]}>
+          <View style={[styles.sidebar, { backgroundColor: '#26a69a' }]}>
 
             {/* Profile */}
             <View style={styles.sidebarProfile}>
@@ -57,6 +61,9 @@ export default function SharedHeader({ title, subtitle, headerBg = undefined }) 
             <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/schedule'); }}>
               <Text style={styles.sidebarItemText}>📅 Patient Schedule</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/registration' as any); }}>
+              <Text style={styles.sidebarItemText}>📋 Patient Registration</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/information'); }}>
               <Text style={styles.sidebarItemText}>💊 Vaccine Information</Text>
             </TouchableOpacity>
@@ -74,18 +81,18 @@ export default function SharedHeader({ title, subtitle, headerBg = undefined }) 
         </View>
       </Modal>
 
-      {/* Transparent status bar */}
+      {/* Status bar — always teal */}
       <StatusBar backgroundColor={statusBg} barStyle="light-content" translucent={false} />
 
-      {/* Header Bar */}
-      <View style={[styles.header, { backgroundColor: resolvedBg, borderBottomColor: C.border }]}>
-        <TouchableOpacity onPress={() => setSidebarOpen(true)}>
-          <Text style={[styles.menuButton, { color: C.text }]}>☰</Text>
+      {/* Header Bar — always teal */}
+      <View style={[styles.header, { backgroundColor: headerBg }]}>
+        <TouchableOpacity onPress={() => setSidebarOpen(true)} style={styles.menuBtnWrap} activeOpacity={0.7}>
+          <Text style={styles.menuButton}>☰</Text>
         </TouchableOpacity>
 
         <View style={styles.headerCenter}>
-          <Text style={[styles.headerTitle, { color: C.text }]} numberOfLines={1}>{title}</Text>
-          {subtitle && <Text style={[styles.headerSubtitle, { color: C.sub }]} numberOfLines={1}>{subtitle}</Text>}
+          <Text style={styles.headerTitle} numberOfLines={1}>{title}</Text>
+          {subtitle ? <Text style={styles.headerSubtitle} numberOfLines={1}>{subtitle}</Text> : null}
         </View>
 
         <TouchableOpacity onPress={() => router.push('/settings')} activeOpacity={0.8}>
@@ -124,31 +131,43 @@ const styles = StyleSheet.create({
   header: {
     paddingVertical: 14,
     paddingHorizontal: 16,
-    borderBottomWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
   },
-  menuButton: { fontSize: 28, fontWeight: 'bold' },
+  menuBtnWrap: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 8,
+    width: 36,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  menuButton: { fontSize: 20, color: '#ffffff', fontWeight: 'bold' },
   headerCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  headerTitle: { fontSize: 16, fontWeight: 'bold', textAlign: 'center' },
-  headerSubtitle: { fontSize: 12, marginTop: 3, textAlign: 'center' },
+  headerTitle: { fontSize: 16, fontWeight: 'bold', textAlign: 'center', color: '#ffffff' },
+  headerSubtitle: { fontSize: 12, marginTop: 3, textAlign: 'center', color: 'rgba(255,255,255,0.75)' },
 
   avatarContainer: {
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
     borderRadius: AVATAR_SIZE / 2,
     borderWidth: 2,
-    borderColor: '#1b7b6b',
+    borderColor: 'rgba(255,255,255,0.5)',
     overflow: 'hidden',
   },
   avatarImage: { width: '100%', height: '100%' },
   avatarFallback: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#E8F7F5',
+    backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  avatarLetter: { fontSize: 16, color: '#1b7b6b', fontWeight: '700' },
+  avatarLetter: { fontSize: 16, color: '#ffffff', fontWeight: '700' },
 });

@@ -9,6 +9,7 @@ import {
   Alert,
   Image,
   Platform,
+  ScrollView,
   StatusBar,
   Switch,
   Text, TextInput, TouchableOpacity,
@@ -33,7 +34,6 @@ export default function SettingsScreen() {
   const [stockAlerts,   setStockAlerts]   = useState(true);
   const [saving,        setSaving]        = useState(false);
 
-  // Use darkMode directly from context 
   const dark = darkMode;
 
   const C = {
@@ -81,7 +81,7 @@ export default function SettingsScreen() {
     await new Promise(r => setTimeout(r, 1000));
     setUsername(localUsername.trim());
     setSaving(false);
-    Alert.alert('✅ Saved', 'Your settings have been updated.', [{ text: 'OK', onPress: () => router.back() }]);
+    Alert.alert('✅ Saved', 'Your settings have been updated.', [{ text: 'OK', onPress: () => router.replace('/dashboard') }]);
     setCurrentPass(''); setNewPass(''); setConfirmPass('');
   };
 
@@ -136,124 +136,136 @@ export default function SettingsScreen() {
   return (
     <>
       <StatusBar backgroundColor={C.topBar} barStyle="light-content" translucent={false} />
-      <SafeAreaView style={[styles.root, { backgroundColor: C.bg }]} edges={['top', 'left', 'right']}>
-          {/* Top Bar */}
-          <View style={{ backgroundColor: C.topBar, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14, flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity onPress={() => router.back()} style={{ backgroundColor: C.topBarBtn, borderRadius: 10, width: 36, height: 36, justifyContent: 'center', alignItems: 'center' }} activeOpacity={0.7}>
-              <Ionicons name="arrow-back" size={20} color={C.topBarText} />
-            </TouchableOpacity>
-            <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text style={{ color: C.topBarText, fontSize: 18, fontWeight: '700' }}>⚙️ User Settings</Text>
-              <Text style={{ color: C.topBarSub, fontSize: 12 }}>Manage your account preferences</Text>
-            </View>
-            <View style={{ width: 36, height: 36 }} />
-          </View>
 
-          {/* Avatar */}
-          <View style={[styles.avatarSection, { backgroundColor: C.card, borderBottomColor: C.border }]}>
-            <TouchableOpacity onPress={pickImage} activeOpacity={0.85}>
-              {avatarUri ? (
-                <Image source={{ uri: avatarUri }} style={styles.avatarImg} />
-              ) : (
-                <View style={styles.avatarFallback}>
-                  <Text style={[styles.avatarInitial, { color: C.teal }]}>{localUsername.charAt(0).toUpperCase()}</Text>
+      {/* SafeAreaView bg = teal so the status bar inset area matches the header */}
+      <SafeAreaView style={[styles.root, { backgroundColor: C.topBar }]} edges={['top', 'left', 'right']}>
+
+        {/* Top Bar — fixed, outside ScrollView */}
+        <View style={{ backgroundColor: C.topBar, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14, flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity onPress={() => router.replace('/dashboard')} style={{ backgroundColor: C.topBarBtn, borderRadius: 10, width: 36, height: 36, justifyContent: 'center', alignItems: 'center' }} activeOpacity={0.7}>
+            <Ionicons name="arrow-back" size={20} color={C.topBarText} />
+          </TouchableOpacity>
+          <View style={{ flex: 1, alignItems: 'center' }}>
+            <Text style={{ color: C.topBarText, fontSize: 18, fontWeight: '700' }}>⚙️ User Settings</Text>
+            <Text style={{ color: C.topBarSub, fontSize: 12 }}>Manage your account preferences</Text>
+          </View>
+          <View style={{ width: 36, height: 36 }} />
+        </View>
+
+        {/* Inner View carries the actual page background color */}
+        <View style={{ flex: 1, backgroundColor: C.bg }}>
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={{ paddingBottom: 40 }}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {/* Avatar */}
+            <View style={[styles.avatarSection, { backgroundColor: C.card, borderBottomColor: C.border }]}>
+              <TouchableOpacity onPress={pickImage} activeOpacity={0.85}>
+                {avatarUri ? (
+                  <Image source={{ uri: avatarUri }} style={styles.avatarImg} />
+                ) : (
+                  <View style={styles.avatarFallback}>
+                    <Text style={[styles.avatarInitial, { color: C.teal }]}>{localUsername.charAt(0).toUpperCase()}</Text>
+                  </View>
+                )}
+                <View style={[styles.avatarCamBtn, { borderColor: C.card }]}>
+                  <Ionicons name="camera" size={14} color="#fff" />
+                </View>
+              </TouchableOpacity>
+              <Text style={[styles.avatarName, { color: C.text }]}>{localUsername || 'User'}</Text>
+              <Text style={[styles.avatarHint, { color: C.sub }]}>Tap the camera icon to change photo</Text>
+            </View>
+
+            {/* Account Info */}
+            <Section label="👤 Account Info">
+              <Field label="Username" icon="✏️" last>
+                <TextInput
+                  style={{ backgroundColor: C.input, borderWidth: 2, borderColor: C.inputBorder, borderRadius: 10, paddingHorizontal: 12, paddingVertical: Platform.OS === 'ios' ? 10 : 8, fontSize: 14, color: C.text }}
+                  value={localUsername} onChangeText={setLocalUsername}
+                  placeholder="Enter username" placeholderTextColor={C.sub} autoCapitalize="none"
+                />
+              </Field>
+            </Section>
+
+            {/* Change Password */}
+            <Section label="🔐 Change Password">
+              <PassField label="Current Password" icon="🔑" value={currentPass} onChange={setCurrentPass} show={showCurrent} onToggleShow={() => setShowCurrent(v => !v)} placeholder="••••••••" />
+              <PassField label="New Password"     icon="🔒" value={newPass}     onChange={setNewPass}     show={showNew}     onToggleShow={() => setShowNew(v => !v)}     placeholder="Min. 6 characters" />
+              {newPass.length > 0 && (
+                <View style={{ paddingHorizontal: 18, paddingBottom: 10 }}>
+                  <View style={styles.strengthRow}>
+                    {[1, 2, 3, 4].map(i => (
+                      <View key={i} style={[styles.strengthBar, { backgroundColor: strength >= i ? strengthColors[strength] : C.border }]} />
+                    ))}
+                  </View>
+                  <Text style={[styles.strengthLabel, { color: strengthColors[strength] }]}>{strengthLabels[strength]}</Text>
                 </View>
               )}
-              <View style={[styles.avatarCamBtn, { borderColor: C.card }]}>
-                <Ionicons name="camera" size={14} color="#fff" />
-              </View>
-            </TouchableOpacity>
-            <Text style={[styles.avatarName, { color: C.text }]}>{localUsername || 'User'}</Text>
-            <Text style={[styles.avatarHint, { color: C.sub }]}>Tap the camera icon to change photo</Text>
-          </View>
+              <PassField label="Confirm New Password" icon="✅" value={confirmPass} onChange={setConfirmPass} show={showConfirm} onToggleShow={() => setShowConfirm(v => !v)} placeholder="Re-enter new password" last />
+              {confirmPass.length > 0 && newPass !== confirmPass && (
+                <Text style={[styles.passMsg, { color: C.red }]}>⚠️ Passwords don't match</Text>
+              )}
+              {confirmPass.length > 0 && newPass === confirmPass && newPass.length > 0 && (
+                <Text style={[styles.passMsg, { color: C.teal }]}>✅ Passwords match</Text>
+              )}
+            </Section>
 
-          {/* Account Info */}
-          <Section label="👤 Account Info">
-            <Field label="Username" icon="✏️" last>
-              <TextInput
-                style={{ backgroundColor: C.input, borderWidth: 2, borderColor: C.inputBorder, borderRadius: 10, paddingHorizontal: 12, paddingVertical: Platform.OS === 'ios' ? 10 : 8, fontSize: 14, color: C.text }}
-                value={localUsername} onChangeText={setLocalUsername}
-                placeholder="Enter username" placeholderTextColor={C.sub} autoCapitalize="none"
+            {/* Appearance */}
+            <Section label="🎨 Appearance">
+              <ToggleRow
+                icon={dark ? '🌙' : '☀️'}
+                label={dark ? 'Dark Mode' : 'Light Mode'}
+                sub={dark ? 'Currently using dark theme' : 'Currently using light theme'}
+                value={dark}
+                onValueChange={setDarkMode}
+                last
               />
-            </Field>
-          </Section>
+            </Section>
 
-          {/* Change Password */}
-          <Section label="🔐 Change Password">
-            <PassField label="Current Password" icon="🔑" value={currentPass} onChange={setCurrentPass} show={showCurrent} onToggleShow={() => setShowCurrent(v => !v)} placeholder="••••••••" />
-            <PassField label="New Password"     icon="🔒" value={newPass}     onChange={setNewPass}     show={showNew}     onToggleShow={() => setShowNew(v => !v)}     placeholder="Min. 6 characters" />
-            {newPass.length > 0 && (
-              <View style={{ paddingHorizontal: 18, paddingBottom: 10 }}>
-                <View style={styles.strengthRow}>
-                  {[1, 2, 3, 4].map(i => (
-                    <View key={i} style={[styles.strengthBar, { backgroundColor: strength >= i ? strengthColors[strength] : C.border }]} />
-                  ))}
-                </View>
-                <Text style={[styles.strengthLabel, { color: strengthColors[strength] }]}>{strengthLabels[strength]}</Text>
+            {/* Notifications */}
+            <Section label="🔔 Notifications">
+              <ToggleRow icon="💉" label="Vaccine Reminders" sub="Get alerts for upcoming vaccines" value={vaccineAlerts} onValueChange={setVaccineAlerts} />
+              <ToggleRow icon="📦" label="Stock Alerts"      sub="Notified when stock is low"        value={stockAlerts}   onValueChange={setStockAlerts}   last />
+            </Section>
+
+            {/* Save */}
+            <TouchableOpacity
+              style={[styles.saveBtn, { backgroundColor: C.teal, opacity: saving ? 0.8 : 1 }]}
+              onPress={handleSave} disabled={saving} activeOpacity={0.85}
+            >
+              {saving ? <ActivityIndicator color="#fff" size="small" /> : <Ionicons name="save-outline" size={18} color="#fff" />}
+              <Text style={styles.saveBtnText}>{saving ? 'Saving...' : 'Save Changes'}</Text>
+            </TouchableOpacity>
+
+            {/* Cancel */}
+            <TouchableOpacity
+              style={[styles.cancelBtn, { borderColor: C.border }]}
+              onPress={() => router.replace('/dashboard')} activeOpacity={0.7}
+            >
+              <Text style={[styles.cancelBtnText, { color: C.sub }]}>Cancel</Text>
+            </TouchableOpacity>
+
+            {/* Logout */}
+            <View style={[styles.sectionCard, { backgroundColor: C.card, marginBottom: 0, elevation: 1 }]}>
+              <View style={[styles.sectionHeader, { borderBottomColor: C.border }]}>
+                <Text style={styles.sectionLabel}>⚠️ Account</Text>
               </View>
-            )}
-            <PassField label="Confirm New Password" icon="✅" value={confirmPass} onChange={setConfirmPass} show={showConfirm} onToggleShow={() => setShowConfirm(v => !v)} placeholder="Re-enter new password" last />
-            {confirmPass.length > 0 && newPass !== confirmPass && (
-              <Text style={[styles.passMsg, { color: C.red }]}>⚠️ Passwords don't match</Text>
-            )}
-            {confirmPass.length > 0 && newPass === confirmPass && newPass.length > 0 && (
-              <Text style={[styles.passMsg, { color: C.teal }]}>✅ Passwords match</Text>
-            )}
-          </Section>
-
-          {/* Appearance — dark mode saves instantly via context */}
-          <Section label="🎨 Appearance">
-            <ToggleRow
-              icon={dark ? '🌙' : '☀️'}
-              label={dark ? 'Dark Mode' : 'Light Mode'}
-              sub={dark ? 'Currently using dark theme' : 'Currently using light theme'}
-              value={dark}
-              onValueChange={setDarkMode}
-              last
-            />
-          </Section>
-
-          {/* Notifications */}
-          <Section label="🔔 Notifications">
-            <ToggleRow icon="💉" label="Vaccine Reminders" sub="Get alerts for upcoming vaccines" value={vaccineAlerts} onValueChange={setVaccineAlerts} />
-            <ToggleRow icon="📦" label="Stock Alerts"      sub="Notified when stock is low"        value={stockAlerts}   onValueChange={setStockAlerts}   last />
-          </Section>
-
-          {/* Save */}
-          <TouchableOpacity
-            style={[styles.saveBtn, { backgroundColor: C.teal, opacity: saving ? 0.8 : 1 }]}
-            onPress={handleSave} disabled={saving} activeOpacity={0.85}
-          >
-            {saving ? <ActivityIndicator color="#fff" size="small" /> : <Ionicons name="save-outline" size={18} color="#fff" />}
-            <Text style={styles.saveBtnText}>{saving ? 'Saving...' : 'Save Changes'}</Text>
-          </TouchableOpacity>
-
-          {/* Cancel */}
-          <TouchableOpacity
-            style={[styles.cancelBtn, { borderColor: C.border }]}
-            onPress={() => router.back()} activeOpacity={0.7}
-          >
-            <Text style={[styles.cancelBtnText, { color: C.sub }]}>Cancel</Text>
-          </TouchableOpacity>
-
-          {/* Logout */}
-          <View style={[styles.sectionCard, { backgroundColor: C.card, marginBottom: 0, elevation: 1 }]}>
-            <View style={[styles.sectionHeader, { borderBottomColor: C.border }]}>
-              <Text style={styles.sectionLabel}>⚠️ Account</Text>
+              <View style={{ padding: 16 }}>
+                <TouchableOpacity
+                  style={[styles.logoutBtn, { borderColor: C.red }]}
+                  onPress={() => router.push('/login')} activeOpacity={0.7}
+                >
+                  <Ionicons name="log-out-outline" size={18} color={C.red} />
+                  <Text style={[styles.logoutBtnText, { color: C.red }]}>Logout</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={{ padding: 16 }}>
-              <TouchableOpacity
-                style={[styles.logoutBtn, { borderColor: C.red }]}
-                onPress={() => router.push('/login')} activeOpacity={0.7}
-              >
-                <Ionicons name="log-out-outline" size={18} color={C.red} />
-                <Text style={[styles.logoutBtnText, { color: C.red }]}>Logout</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
 
-          <View style={{ height: 40 }} />
-        
+          </ScrollView>
+        </View>
+
       </SafeAreaView>
     </>
   );
