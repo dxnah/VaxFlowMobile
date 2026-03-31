@@ -1,3 +1,5 @@
+// styles/History.js
+
 import { Platform, StatusBar, StyleSheet } from 'react-native';
 
 const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) : 0;

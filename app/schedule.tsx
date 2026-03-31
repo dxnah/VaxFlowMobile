@@ -1,5 +1,6 @@
 // app/schedule.tsx
 
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert, FlatList, Modal, Platform,
@@ -7,7 +8,6 @@ import {
   Text, TouchableOpacity, View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import SharedHeader from '../components/SharedHeader';
 import { useUser } from '../context/UserContext';
 
 interface Dose {
@@ -21,6 +21,7 @@ interface Dose {
 const STATUS_BAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) : 0;
 
 export default function PatientScheduleScreen() {
+  const router = useRouter();
   const { darkMode } = useUser();
   const dark = darkMode;
 
@@ -102,12 +103,18 @@ export default function PatientScheduleScreen() {
   const prevMonth = () => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1));
 
   return (
-    // SafeAreaView bg = teal so the status bar inset area matches the header
-    <SafeAreaView style={[styles.root, { backgroundColor: dark ? '#1a2e2c' : '#2BAF9E' }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={[styles.root, { backgroundColor: C.topBar }]} edges={['top', 'left', 'right']}>
+      <StatusBar translucent={false} backgroundColor={C.topBar} barStyle="light-content" />
 
-      <SharedHeader title="📅 Patient Schedule" subtitle="Track your vaccination doses" />
+      {/* ── Header ── */}
+      <View style={[styles.header, { backgroundColor: C.topBar }]}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+          <Text style={styles.backText}>← Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>📅 Patient Schedule</Text>
+        <View style={{ width: 70 }} />
+      </View>
 
-      {/* Inner view carries the actual page background color */}
       <View style={{ flex: 1, backgroundColor: C.contentBg }}>
         <ScrollView style={styles.container}>
           <View style={styles.contentPadding}>
@@ -295,6 +302,24 @@ export default function PatientScheduleScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   statusBarSpacer: { height: STATUS_BAR_HEIGHT },
+
+  // ── Header ──
+  header: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  backBtn: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  backText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  headerTitle: { color: '#fff', fontWeight: '800', fontSize: 16 },
+
   container: { flex: 1 },
   contentPadding: { padding: 16, paddingTop: 12 },
 

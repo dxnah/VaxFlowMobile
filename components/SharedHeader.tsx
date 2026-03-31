@@ -58,15 +58,6 @@ export default function SharedHeader({ title, subtitle }: Props) {
             <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/dashboard'); }}>
               <Text style={styles.sidebarItemText}>📊 Dashboard</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/schedule'); }}>
-              <Text style={styles.sidebarItemText}>📅 Patient Schedule</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/registration' as any); }}>
-              <Text style={styles.sidebarItemText}>📋 Patient Registration</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/information'); }}>
-              <Text style={styles.sidebarItemText}>💊 Vaccine Information</Text>
-            </TouchableOpacity>
             <TouchableOpacity style={styles.sidebarItem} onPress={() => { setSidebarOpen(false); router.push('/history'); }}>
               <Text style={styles.sidebarItemText}>📋 Vaccination History</Text>
             </TouchableOpacity>
@@ -81,10 +72,8 @@ export default function SharedHeader({ title, subtitle }: Props) {
         </View>
       </Modal>
 
-      {/* Status bar — always teal */}
       <StatusBar backgroundColor={statusBg} barStyle="light-content" translucent={false} />
 
-      {/* Header Bar — always teal */}
       <View style={[styles.header, { backgroundColor: headerBg }]}>
         <TouchableOpacity onPress={() => setSidebarOpen(true)} style={styles.menuBtnWrap} activeOpacity={0.7}>
           <Text style={styles.menuButton}>☰</Text>
@@ -140,34 +129,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
   },
-  menuBtnWrap: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 8,
-    width: 36,
-    height: 36,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  menuBtnWrap: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 8, width: 36, height: 36, justifyContent: 'center', alignItems: 'center' },
   menuButton: { fontSize: 20, color: '#ffffff', fontWeight: 'bold' },
   headerCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   headerTitle: { fontSize: 16, fontWeight: 'bold', textAlign: 'center', color: '#ffffff' },
   headerSubtitle: { fontSize: 12, marginTop: 3, textAlign: 'center', color: 'rgba(255,255,255,0.75)' },
 
-  avatarContainer: {
-    width: AVATAR_SIZE,
-    height: AVATAR_SIZE,
-    borderRadius: AVATAR_SIZE / 2,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.5)',
-    overflow: 'hidden',
-  },
+  avatarContainer: { width: AVATAR_SIZE, height: AVATAR_SIZE, borderRadius: AVATAR_SIZE / 2, borderWidth: 2, borderColor: 'rgba(255,255,255,0.5)', overflow: 'hidden' },
   avatarImage: { width: '100%', height: '100%' },
-  avatarFallback: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  avatarFallback: { width: '100%', height: '100%', backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
   avatarLetter: { fontSize: 16, color: '#ffffff', fontWeight: '700' },
 });

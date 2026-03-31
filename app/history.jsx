@@ -7,13 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import SharedHeader from '../components/SharedHeader';
 import { useUser } from '../context/UserContext';
 import styles from '../styles/History';
-
-const INITIAL_RECORDS = [
-  { id: 1, vaccine: 'Anti-Rabies Vaccine (ARV)', dose: '1st Dose', date: 'January 15, 2025', facility: 'ABTC - City Health Office', administered: 'Dr. Santos', color: '#e53935', cardImage: null },
-  { id: 2, vaccine: 'Anti-Rabies Vaccine (ARV)', dose: '2nd Dose', date: 'January 22, 2025', facility: 'ABTC - City Health Office', administered: 'Dr. Santos', color: '#e53935', cardImage: null },
-  { id: 3, vaccine: 'BCG', dose: '1st Dose', date: 'March 3, 2025', facility: 'City Health Office, CDO', administered: 'Nurse Reyes', color: '#1e88e5', cardImage: null },
-  { id: 4, vaccine: 'Hepatitis B', dose: '1st Dose', date: 'March 10, 2025', facility: 'City Health Office, CDO', administered: 'Nurse Cruz', color: '#f57c00', cardImage: null },
-];
+import { vaccinationRecords } from '../data/mockData';
 
 function DigitalCard({ record, dark, onAddImage, onReplaceImage, onRemoveImage, onViewImage }) {
   const C = {
@@ -104,9 +98,8 @@ function DigitalCard({ record, dark, onAddImage, onReplaceImage, onRemoveImage, 
 export default function HistoryScreen() {
   const { username, darkMode, avatarUri } = useUser();
   const dark = darkMode;
-  const topBar = dark ? '#1a2e2c' : '#2BAF9E';
 
-  const [records, setRecords]       = useState(INITIAL_RECORDS);
+  const [records, setRecords]           = useState(vaccinationRecords);
   const [viewingImage, setViewingImage] = useState(null);
 
   const C = {
@@ -150,54 +143,53 @@ export default function HistoryScreen() {
       <SharedHeader title="💉 Vaccination History" subtitle="Your digital vaccination records" />
 
       <View style={{ flex: 1, backgroundColor: C.bg }}>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.statsRow}>
-          {[
-            { num: records.length,                          label: 'Total Doses',    color: '#2BAF9E' },
-            { num: totalVaccines,                           label: 'Vaccines',       color: '#1e88e5' },
-            { num: records.filter(r => r.cardImage).length, label: 'Cards Uploaded', color: '#43a047' },
-          ].map((s, i) => (
-            <View key={i} style={[styles.statBox, { backgroundColor: C.card, borderColor: C.border }]}>
-              <Text style={[styles.statNum, { color: s.color }]}>{s.num}</Text>
-              <Text style={[styles.statLabel, { color: C.sub }]}>{s.label}</Text>
-            </View>
-          ))}
-        </View>
-
-        <View style={[styles.patientCard, { backgroundColor: C.card, borderColor: C.border }]}>
-          <View style={styles.patientLeft}>
-            {avatarUri ? (
-              <Image source={{ uri: avatarUri }} style={styles.patientAvatar} />
-            ) : (
-              <View style={[styles.patientAvatarPlaceholder, { backgroundColor: dark ? '#1e3330' : '#e0f7f4' }]}>
-                <Text style={{ fontSize: 22, color: '#2BAF9E', fontWeight: '700' }}>{username.charAt(0).toUpperCase()}</Text>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <View style={styles.statsRow}>
+            {[
+              { num: records.length,                           label: 'Total Doses',    color: '#2BAF9E' },
+              { num: totalVaccines,                            label: 'Vaccines',       color: '#1e88e5' },
+              { num: records.filter(r => r.cardImage).length,  label: 'Cards Uploaded', color: '#43a047' },
+            ].map((s, i) => (
+              <View key={i} style={[styles.statBox, { backgroundColor: C.card, borderColor: C.border }]}>
+                <Text style={[styles.statNum, { color: s.color }]}>{s.num}</Text>
+                <Text style={[styles.statLabel, { color: C.sub }]}>{s.label}</Text>
               </View>
-            )}
-            <View>
-              <Text style={[styles.patientName, { color: C.text }]}>{username}</Text>
-              <Text style={[styles.patientSub, { color: C.sub }]}>ABTC-CHO Patient</Text>
+            ))}
+          </View>
+
+          <View style={[styles.patientCard, { backgroundColor: C.card, borderColor: C.border }]}>
+            <View style={styles.patientLeft}>
+              {avatarUri ? (
+                <Image source={{ uri: avatarUri }} style={styles.patientAvatar} />
+              ) : (
+                <View style={[styles.patientAvatarPlaceholder, { backgroundColor: dark ? '#1e3330' : '#e0f7f4' }]}>
+                  <Text style={{ fontSize: 22, color: '#2BAF9E', fontWeight: '700' }}>{username.charAt(0).toUpperCase()}</Text>
+                </View>
+              )}
+              <View>
+                <Text style={[styles.patientName, { color: C.text }]}>{username}</Text>
+                <Text style={[styles.patientSub, { color: C.sub }]}>ABTC-CHO Patient</Text>
+              </View>
+            </View>
+            <View style={[styles.patientBadge, { backgroundColor: dark ? '#1e3330' : '#e0f7f4' }]}>
+              <Text style={{ fontSize: 10, color: '#2BAF9E', fontWeight: '700' }}>🏥 CDO</Text>
             </View>
           </View>
-          <View style={[styles.patientBadge, { backgroundColor: dark ? '#1e3330' : '#e0f7f4' }]}>
-            <Text style={{ fontSize: 10, color: '#2BAF9E', fontWeight: '700' }}>🏥 CDO</Text>
-          </View>
-        </View>
 
-        <Text style={[styles.sectionTitle, { color: C.sub }]}>VACCINATION RECORDS</Text>
-        {records.map(record => (
-          <DigitalCard
-            key={record.id}
-            record={record}
-            dark={dark}
-            onAddImage={handleAddImage}
-            onReplaceImage={handleReplaceImage}
-            onRemoveImage={handleRemoveImage}
-            onViewImage={setViewingImage}
-          />
-        ))}
-        <View style={{ height: 30 }} />
-      </ScrollView>
-
+          <Text style={[styles.sectionTitle, { color: C.sub }]}>VACCINATION RECORDS</Text>
+          {records.map(record => (
+            <DigitalCard
+              key={record.id}
+              record={record}
+              dark={dark}
+              onAddImage={handleAddImage}
+              onReplaceImage={handleReplaceImage}
+              onRemoveImage={handleRemoveImage}
+              onViewImage={setViewingImage}
+            />
+          ))}
+          <View style={{ height: 30 }} />
+        </ScrollView>
       </View>
 
       <Modal visible={!!viewingImage} transparent animationType="fade">

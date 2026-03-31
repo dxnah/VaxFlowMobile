@@ -1,9 +1,9 @@
 // app/information.jsx
 
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import SharedHeader from '../components/SharedHeader';
 import { useUser } from '../context/UserContext';
 import styles from '../styles/Information';
 
@@ -81,16 +81,24 @@ function VaccineCard({ vaccine, dark }) {
 }
 
 export default function InformationScreen() {
+  const router = useRouter();
   const { darkMode } = useUser();
   const dark = darkMode;
+  const topBar = dark ? '#1a2e2c' : '#2BAF9E';
 
   return (
-    // SafeAreaView bg = teal so the status bar inset area matches the header
-    <SafeAreaView style={[styles.root, { backgroundColor: dark ? '#1a2e2c' : '#2BAF9E' }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={[styles.root, { backgroundColor: topBar }]} edges={['top', 'left', 'right']}>
+      <StatusBar translucent={false} backgroundColor={topBar} barStyle="light-content" />
 
-      <SharedHeader title="💊 Vaccine Information" subtitle="Details about each available vaccine" />
+      {/* ── Header ── */}
+      <View style={[headerStyles.header, { backgroundColor: topBar }]}>
+        <TouchableOpacity onPress={() => router.back()} style={headerStyles.backBtn} activeOpacity={0.7}>
+          <Text style={headerStyles.backText}>← Back</Text>
+        </TouchableOpacity>
+        <Text style={headerStyles.headerTitle}>💊 Vaccine Information</Text>
+        <View style={{ width: 70 }} />
+      </View>
 
-      {/* Inner view carries the actual page background color */}
       <View style={{ flex: 1, backgroundColor: dark ? '#1a1f1e' : '#EEF7F6' }}>
         <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           <View style={[styles.introBanner, { backgroundColor: dark ? '#1e3330' : '#e0f7f4', borderColor: dark ? '#2e4a46' : '#b2dfdb' }]}>
@@ -111,3 +119,21 @@ export default function InformationScreen() {
     </SafeAreaView>
   );
 }
+
+const headerStyles = StyleSheet.create({
+  header: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  backBtn: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  backText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  headerTitle: { color: '#fff', fontWeight: '800', fontSize: 16 },
+});
