@@ -1,9 +1,8 @@
 // components/dashboard/Registration.jsx
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
     Alert,
-    Animated,
     KeyboardAvoidingView,
     LayoutAnimation,
     Modal,
@@ -21,12 +20,12 @@ if (Platform.OS === 'android') {
   UIManager.setLayoutAnimationEnabledExperimental?.(true);
 }
 
-const MAX_REGISTRATIONS = 4;
+
 
 const QUESTIONS = [
   { id: 1, key: 'incidentDate',     type: 'date',   label: 'Q1. When did this happen?',                                    placeholder: 'Tap the calendar to set a date.' },
   { id: 2, key: 'injuryType',       type: 'choice', label: 'Q2. Were you bitten or scratched?',                            options: ['Bitten', 'Scratched'] },
-  { id: 3, key: 'animalType',       type: 'choice', label: 'Q3. What animal ____ you?',                                    options: ['Cat', 'Dog'] },
+  { id: 3, key: 'animalType',       type: 'choice', label: 'Q3. What animal ____ you?',                                    options: ['Cat', 'Dog', 'Others'] },
   { id: 4, key: 'animalOwner',      type: 'choice', label: 'Q4. Who owns that animal?',                                    options: ['Family pet', "Neighbor's pet", 'Stray animal', 'Others'] },
   { id: 5, key: 'animalVaccinated', type: 'choice', label: 'Q5. Was that animal vaccinated with anti-rabies this year?',   options: ['Yes', 'No', 'Not sure'] },
   { id: 6, key: 'bodyPart',         type: 'text',   label: 'Q6. What body part(s) were you ____? Please specify.',         placeholder: 'e.g. left hand, right arm...' },
@@ -51,7 +50,7 @@ const Field = ({ label, icon, value, onChangeText, placeholder, keyboardType, mu
   </View>
 );
 
-export default function Registration() {
+export default function Registration({ onDone }) {
   const { darkMode } = useUser();
   const dark = darkMode;
 
@@ -83,59 +82,7 @@ export default function Registration() {
   const [editing, setEditing]  = useState(false);
   const [savedList, setSavedList]         = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(null);
-  const [showLimitAlert, setShowLimitAlert] = useState(false);
-  const limitAlertOpacity = useRef(new Animated.Value(0)).current;
-  const limitAlertTimer   = useRef(null);
 
-  const triggerLimitAlert = () => {
-    if (limitAlertTimer.current) clearTimeout(limitAlertTimer.current);
-    Animated.timing(limitAlertOpacity, { toValue: 1, duration: 250, useNativeDriver: true }).start();
-    setShowLimitAlert(true);
-    limitAlertTimer.current = setTimeout(() => {
-      Animated.timing(limitAlertOpacity, { toValue: 0, duration: 400, useNativeDriver: true }).start(() => setShowLimitAlert(false));
-    }, 4000);
-  };
-
-  useEffect(() => () => { if (limitAlertTimer.current) clearTimeout(limitAlertTimer.current); }, []);
-
-  const [showAddrPicker, setShowAddrPicker] = useState(false);
-  const [addrRegions,    setAddrRegions]    = useState([]);
-  const [addrProvinces,  setAddrProvinces]  = useState([]);
-  const [addrCities,     setAddrCities]     = useState([]);
-  const [addrBarangays,  setAddrBarangays]  = useState([]);
-  const [addrRegion,     setAddrRegion]     = useState(null);
-  const [addrProvince,   setAddrProvince]   = useState(null);
-  const [addrCity,       setAddrCity]       = useState(null);
-  const [addrBarangay,   setAddrBarangay]   = useState(null);
-  const [addrLoading,    setAddrLoading]    = useState('');
-  const [addrOpen,       setAddrOpen]       = useState('region');
-
-  const PSGC = 'https://psgc.cloud/api';
-
-  const fetchRegions = async () => {
-    try { setAddrLoading('region'); const res = await fetch(`${PSGC}/regions`); const data = await res.json(); setAddrRegions(data.sort((a, b) => a.name.localeCompare(b.name))); }
-    catch { Alert.alert('Network Error', 'Could not load regions.'); } finally { setAddrLoading(''); }
-  };
-  const fetchProvinces = async (regionCode) => {
-    try { setAddrLoading('province'); setAddrProvinces([]); setAddrCities([]); setAddrBarangays([]); setAddrProvince(null); setAddrCity(null); setAddrBarangay(null); const res = await fetch(`${PSGC}/regions/${regionCode}/provinces`); const data = await res.json(); setAddrProvinces(data.sort((a, b) => a.name.localeCompare(b.name))); setAddrOpen('province'); }
-    catch { Alert.alert('Network Error', 'Could not load provinces.'); } finally { setAddrLoading(''); }
-  };
-  const fetchCities = async (provinceCode) => {
-    try { setAddrLoading('city'); setAddrCities([]); setAddrBarangays([]); setAddrCity(null); setAddrBarangay(null); const [cRes, mRes] = await Promise.all([fetch(`${PSGC}/provinces/${provinceCode}/cities`), fetch(`${PSGC}/provinces/${provinceCode}/municipalities`)]); const cities = await cRes.json(); const munis = await mRes.json(); const combined = [...(Array.isArray(cities) ? cities : []), ...(Array.isArray(munis) ? munis : [])]; setAddrCities(combined.sort((a, b) => a.name.localeCompare(b.name))); setAddrOpen('city'); }
-    catch { Alert.alert('Network Error', 'Could not load cities.'); } finally { setAddrLoading(''); }
-  };
-  const fetchBarangays = async (cityCode) => {
-    try { setAddrLoading('barangay'); setAddrBarangays([]); setAddrBarangay(null); const res = await fetch(`${PSGC}/cities-municipalities/${cityCode}/barangays`); const data = await res.json(); setAddrBarangays(data.sort((a, b) => a.name.localeCompare(b.name))); setAddrOpen('barangay'); }
-    catch { Alert.alert('Network Error', 'Could not load barangays.'); } finally { setAddrLoading(''); }
-  };
-
-  const openAddrPicker = () => { setShowAddrPicker(true); setAddrOpen('region'); if (addrRegions.length === 0) fetchRegions(); };
-  const saveAddress = () => {
-    if (!addrRegion || !addrProvince || !addrCity || !addrBarangay) { Alert.alert('Incomplete', 'Please select all address fields.'); return; }
-    setForm(p => ({ ...p, address: `${addrBarangay.name}, ${addrCity.name}, ${addrProvince.name}, ${addrRegion.name}, Philippines` }));
-    setShowAddrPicker(false);
-  };
-  const clearAddress = () => { animate(); setForm(p => ({ ...p, address: '' })); setAddrRegion(null); setAddrProvince(null); setAddrCity(null); setAddrBarangay(null); };
 
   const [showBdayPicker, setShowBdayPicker] = useState(false);
   const [bdYear,  setBdYear]  = useState(2000);
@@ -173,6 +120,7 @@ export default function Registration() {
     animate();
     const finalAnswers = { ...answers };
     if (finalAnswers.animalOwner === 'Others') finalAnswers.animalOwner = `Others: ${othersText}`;
+    if (finalAnswers.animalType === 'Others') finalAnswers.animalType = `Others: ${othersText}`;
     setSavedList(prev => [...prev, { form, answers: finalAnswers }]);
     setSelectedIndex(savedList.length);
     setPhase('view');
@@ -201,7 +149,7 @@ export default function Registration() {
     setEditing(false); setPhase('view');
   };
 
-  const startNewRegistration = () => { if (savedList.length >= MAX_REGISTRATIONS) { triggerLimitAlert(); return; } animate(); resetWorkingState(); setPhase('questions'); };
+  const startNewRegistration = () => { animate(); resetWorkingState(); setPhase('questions'); };
   const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
   const confirmDate = () => { if (!dpDay) return; setAnswers(prev => ({ ...prev, incidentDate: `${MONTHS[dpMonth]} ${String(dpDay).padStart(2, '0')}, ${dpYear}` })); setShowDatePicker(false); setDpDay(null); };
   const clearDate = () => { animate(); setAnswers(prev => ({ ...prev, incidentDate: null })); };
@@ -223,26 +171,18 @@ export default function Registration() {
   );
 
   const renderList = () => {
-    const atLimit = savedList.length >= MAX_REGISTRATIONS;
     return (
       <View style={{ padding: 20 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <View>
             <Text style={{ fontSize: 17, fontWeight: '800', color: C.text }}>My Registrations</Text>
-            <Text style={{ fontSize: 12, color: C.sub, marginTop: 2 }}>{savedList.length} / {MAX_REGISTRATIONS} used</Text>
+            <Text style={{ fontSize: 12, color: C.sub, marginTop: 2 }}>{savedList.length} registered</Text>
           </View>
-          <TouchableOpacity onPress={startNewRegistration} activeOpacity={atLimit ? 0.6 : 0.85} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: atLimit ? (dark ? '#2e3837' : '#e0e0e0') : C.teal, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, elevation: atLimit ? 0 : 3 }}>
-            <Text style={{ fontSize: 16, color: atLimit ? C.sub : '#fff' }}>＋</Text>
-            <Text style={{ color: atLimit ? C.sub : '#fff', fontWeight: '800', fontSize: 13 }}>New</Text>
+          <TouchableOpacity onPress={startNewRegistration} activeOpacity={0.85} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: C.teal, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, elevation: 3 }}>
+            <Text style={{ fontSize: 16, color: '#fff' }}>＋</Text>
+            <Text style={{ color: '#fff', fontWeight: '800', fontSize: 13 }}>New</Text>
           </TouchableOpacity>
         </View>
-
-        {showLimitAlert && (
-          <Animated.View style={{ opacity: limitAlertOpacity, backgroundColor: dark ? '#3b1f1f' : '#fff3e0', borderRadius: 12, padding: 13, borderWidth: 1.5, borderColor: C.orange, flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-            <Text style={{ fontSize: 20 }}>⚠️</Text>
-            <Text style={{ color: C.orange, fontWeight: '700', fontSize: 13, flex: 1 }}>You've reached the maximum registration limit!</Text>
-          </Animated.View>
-        )}
 
         {savedList.length === 0 ? (
           <View style={{ backgroundColor: C.card, borderRadius: 20, padding: 32, borderWidth: 1, borderColor: C.border, alignItems: 'center', marginTop: 8 }}>
@@ -264,7 +204,7 @@ export default function Registration() {
               return (
                 <TouchableOpacity key={index} onPress={() => { animate(); setSelectedIndex(index); setPhase('view'); }} activeOpacity={0.82} style={{ backgroundColor: C.card, borderRadius: 16, borderWidth: 1.5, borderColor: C.border, padding: 16, elevation: 2, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
                   <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: C.tealLight, borderWidth: 2, borderColor: C.teal, justifyContent: 'center', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 22 }}>👤</Text>
+                    <Text style={{ fontSize: 13, color: C.teal, fontWeight: '900' }}>{`Q-${String(index + 1).padStart(3, '0')}`}</Text>
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={{ fontSize: 15, fontWeight: '800', color: C.text }} numberOfLines={1}>{entry.form.fullName}</Text>
@@ -280,11 +220,7 @@ export default function Registration() {
                 </TouchableOpacity>
               );
             })}
-            {savedList.length < MAX_REGISTRATIONS && (
-              <View style={{ alignItems: 'center', paddingVertical: 8 }}>
-                <Text style={{ color: C.sub, fontSize: 12 }}>{MAX_REGISTRATIONS - savedList.length} slot{MAX_REGISTRATIONS - savedList.length !== 1 ? 's' : ''} remaining</Text>
-              </View>
-            )}
+
           </View>
         )}
       </View>
@@ -391,6 +327,7 @@ export default function Registration() {
 
           <Field C={C} label="Full Name" icon="👤" value={form.fullName} onChangeText={(v) => setForm(p => ({ ...p, fullName: v }))} placeholder="e.g. Juan Dela Cruz" />
 
+          {/* Birthdate picker */}
           <View style={{ marginBottom: 16 }}>
             <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', letterSpacing: 0.8, marginBottom: 6, textTransform: 'uppercase' }}>📅  Birthdate</Text>
             {form.birthdate ? (
@@ -408,6 +345,7 @@ export default function Registration() {
             )}
           </View>
 
+          {/* Age — auto-filled */}
           <View style={{ marginBottom: 16 }}>
             <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', letterSpacing: 0.8, marginBottom: 6, textTransform: 'uppercase' }}>🎂  Age</Text>
             <View style={{ backgroundColor: form.age ? C.tealLight : C.input, borderWidth: 1.5, borderColor: form.age ? C.teal : C.border, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, flexDirection: 'row', alignItems: 'center' }}>
@@ -416,27 +354,8 @@ export default function Registration() {
             </View>
           </View>
 
-          <View style={{ marginBottom: 16 }}>
-            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', letterSpacing: 0.8, marginBottom: 6, textTransform: 'uppercase' }}>🏠  Address</Text>
-            {form.address ? (
-              <View style={{ backgroundColor: C.tealLight, borderRadius: 12, padding: 14, borderWidth: 1.5, borderColor: C.teal }}>
-                <Text style={{ color: C.teal, fontSize: 13, fontWeight: '600', lineHeight: 20, marginBottom: 10 }}>{form.address}</Text>
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8 }}>
-                  <TouchableOpacity style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: C.red, backgroundColor: dark ? '#2d1a1a' : '#ffebee' }} onPress={clearAddress}>
-                    <Text style={{ color: C.red, fontSize: 11, fontWeight: '700' }}>🗑️ Delete</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: C.teal }} onPress={openAddrPicker}>
-                    <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>✏️ Edit</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ) : (
-              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: C.input, borderRadius: 12, padding: 14, borderWidth: 1.5, borderColor: C.border, gap: 10 }} onPress={openAddrPicker} activeOpacity={0.8}>
-                <Text style={{ fontSize: 20 }}>🏠</Text>
-                <Text style={{ color: C.sub, fontSize: 14 }}>Tap to select your address</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          {/* ✅ Simple text address field */}
+          <Field C={C} label="Address" icon="🏠" value={form.address} onChangeText={(v) => setForm(p => ({ ...p, address: v }))} placeholder="e.g. Brgy. Carmen, Cagayan de Oro City" multiline />
 
           <Field C={C} label="Contact Number" icon="📞" value={form.contact} onChangeText={(v) => setForm(p => ({ ...p, contact: v }))} placeholder="e.g. 09123456789" keyboardType="phone-pad" />
 
@@ -457,7 +376,7 @@ export default function Registration() {
     const entry = savedList[selectedIndex];
     if (!entry) { setPhase('list'); return null; }
     const { form: f, answers: a } = entry;
-    const qrData = JSON.stringify({ ...f, ...a });
+    const queueNumber = `Q-${String(selectedIndex + 1).padStart(3, '0')}`;
     const Row = ({ label, value }) => (
       <View style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: C.border }}>
         <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 2 }}>{label}</Text>
@@ -490,12 +409,21 @@ export default function Registration() {
           <Row label="Body Part(s) Affected" value={a.bodyPart} />
           <Text style={{ fontSize: 9, color: '#bbb', textAlign: 'center', marginTop: 16 }}>This form is for ABTC-CHO use only.</Text>
         </View>
+        {/* Queue Number Card */}
         <View style={{ backgroundColor: C.card, borderRadius: 16, borderWidth: 1, borderColor: C.border, overflow: 'hidden', marginBottom: 16 }}>
           <View style={{ backgroundColor: C.teal, padding: 12, alignItems: 'center' }}>
-            <Text style={{ color: '#fff', fontWeight: '800', fontSize: 13 }}>📱 Verification QR Code</Text>
+            <Text style={{ color: '#fff', fontWeight: '800', fontSize: 13 }}>🎫 Your Queue Number</Text>
             <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 11, marginTop: 2 }}>Present this at the front desk</Text>
           </View>
-          <QRDisplay data={qrData} />
+          <View style={{ alignItems: 'center', paddingVertical: 32, paddingHorizontal: 20 }}>
+            <View style={{ backgroundColor: C.tealLight, borderRadius: 20, borderWidth: 2.5, borderColor: C.teal, paddingHorizontal: 40, paddingVertical: 20, alignItems: 'center', marginBottom: 12 }}>
+              <Text style={{ fontSize: 11, color: C.sub, fontWeight: '700', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 6 }}>Queue Number</Text>
+              <Text style={{ fontSize: 52, fontWeight: '900', color: C.teal, letterSpacing: 2 }}>{queueNumber}</Text>
+            </View>
+            <Text style={{ color: C.sub, fontSize: 12, textAlign: 'center', lineHeight: 18 }}>
+              Please wait for your number to be called.{'\n'}Show this screen to the front desk staff.
+            </Text>
+          </View>
         </View>
         <View style={{ flexDirection: 'row', gap: 12, marginBottom: 8 }}>
           <TouchableOpacity style={{ flex: 1, paddingVertical: 14, borderRadius: 12, borderWidth: 1.5, borderColor: C.red, alignItems: 'center', backgroundColor: dark ? '#2d1a1a' : '#ffebee' }} onPress={() => handleDelete(selectedIndex)} activeOpacity={0.8}>
@@ -505,6 +433,13 @@ export default function Registration() {
             <Text style={{ color: '#fff', fontWeight: '800' }}>✏️ Edit Registration</Text>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          style={{ paddingVertical: 15, borderRadius: 12, backgroundColor: C.green, alignItems: 'center', elevation: 3, marginBottom: 8 }}
+          onPress={() => { animate(); if (onDone) onDone(); else setPhase('list'); }}
+          activeOpacity={0.85}
+        >
+          <Text style={{ color: '#fff', fontWeight: '800', fontSize: 15 }}>✅ Done</Text>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -572,74 +507,6 @@ export default function Registration() {
     );
   };
 
-  const renderAddrPicker = () => {
-    const DropdownSection = ({ title, icon, items, selected, onSelect, loading, isOpen, onToggle, disabled }) => (
-      <View style={{ marginBottom: 12 }}>
-        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', padding: 13, borderRadius: 12, borderWidth: 1.5, borderColor: selected ? C.teal : (disabled ? C.border + '60' : C.border), backgroundColor: selected ? C.tealLight : (disabled ? C.input + '80' : C.input), gap: 10 }} onPress={disabled ? undefined : onToggle} activeOpacity={disabled ? 1 : 0.8}>
-          <Text style={{ fontSize: 16 }}>{icon}</Text>
-          <View style={{ flex: 1 }}>
-            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.6 }}>{title}</Text>
-            <Text style={{ color: selected ? C.teal : (disabled ? C.border : C.sub), fontSize: 13, fontWeight: selected ? '700' : '400', marginTop: 1 }} numberOfLines={1}>
-              {loading === title.toLowerCase() ? 'Loading...' : (selected ? selected.name : (disabled ? 'Select previous field first' : `Select ${title}`))}
-            </Text>
-          </View>
-          {selected && <Text style={{ color: C.teal, fontSize: 14, fontWeight: '800' }}>✓</Text>}
-          {!selected && !disabled && <Text style={{ color: C.sub, fontSize: 12 }}>{isOpen ? '▲' : '▼'}</Text>}
-        </TouchableOpacity>
-        {isOpen && items.length > 0 && (
-          <View style={{ borderWidth: 1, borderColor: C.border, borderRadius: 12, marginTop: 4, overflow: 'hidden', maxHeight: 200 }}>
-            <ScrollView nestedScrollEnabled showsVerticalScrollIndicator>
-              {items.map((item) => { const isSelected = selected?.code === item.code; return (
-                <TouchableOpacity key={item.code} style={{ padding: 13, borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: isSelected ? C.tealLight : C.card, flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => onSelect(item)} activeOpacity={0.7}>
-                  {isSelected && <Text style={{ color: C.teal, fontSize: 12, fontWeight: '800' }}>✓</Text>}
-                  <Text style={{ flex: 1, color: isSelected ? C.teal : C.text, fontSize: 13, fontWeight: isSelected ? '700' : '400' }}>{item.name}</Text>
-                </TouchableOpacity>
-              ); })}
-            </ScrollView>
-          </View>
-        )}
-      </View>
-    );
-
-    return (
-      <Modal visible={showAddrPicker} transparent animationType="slide">
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' }}>
-          <View style={{ backgroundColor: C.card, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, maxHeight: '90%' }}>
-            <Text style={{ fontSize: 16, fontWeight: '800', color: C.text, textAlign: 'center', marginBottom: 4 }}>📍 Select Address</Text>
-            <Text style={{ fontSize: 12, color: C.sub, textAlign: 'center', marginBottom: 16 }}>Select from Region down to Barangay</Text>
-            <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled keyboardShouldPersistTaps="handled">
-              <View style={{ marginBottom: 12 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', padding: 13, borderRadius: 12, borderWidth: 1.5, borderColor: C.teal, backgroundColor: C.tealLight, gap: 10 }}>
-                  <Text style={{ fontSize: 16 }}>🇵🇭</Text>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.6 }}>Country</Text>
-                    <Text style={{ color: C.teal, fontSize: 13, fontWeight: '700', marginTop: 1 }}>Philippines</Text>
-                  </View>
-                  <Text style={{ color: C.teal, fontSize: 14, fontWeight: '800' }}>✓</Text>
-                  <Text style={{ color: C.sub, fontSize: 11 }}>🔒</Text>
-                </View>
-              </View>
-              <DropdownSection title="Region" icon="🗺️" items={addrRegions} selected={addrRegion} loading={addrLoading} isOpen={addrOpen === 'region'} onToggle={() => setAddrOpen(addrOpen === 'region' ? '' : 'region')} onSelect={(item) => { setAddrRegion(item); fetchProvinces(item.code); }} disabled={false} />
-              <DropdownSection title="Province" icon="🏛️" items={addrProvinces} selected={addrProvince} loading={addrLoading} isOpen={addrOpen === 'province'} onToggle={() => setAddrOpen(addrOpen === 'province' ? '' : 'province')} onSelect={(item) => { setAddrProvince(item); fetchCities(item.code); }} disabled={!addrRegion} />
-              <DropdownSection title="City / Municipality" icon="🏙️" items={addrCities} selected={addrCity} loading={addrLoading} isOpen={addrOpen === 'city'} onToggle={() => setAddrOpen(addrOpen === 'city' ? '' : 'city')} onSelect={(item) => { setAddrCity(item); fetchBarangays(item.code); }} disabled={!addrProvince} />
-              <DropdownSection title="Barangay" icon="🏘️" items={addrBarangays} selected={addrBarangay} loading={addrLoading} isOpen={addrOpen === 'barangay'} onToggle={() => setAddrOpen(addrOpen === 'barangay' ? '' : 'barangay')} onSelect={(item) => { setAddrBarangay(item); setAddrOpen(''); }} disabled={!addrCity} />
-              {addrBarangay && (
-                <View style={{ backgroundColor: dark ? '#1e2d3d' : '#e3f2fd', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#2196f3', marginBottom: 12 }}>
-                  <Text style={{ color: '#2196f3', fontSize: 11, fontWeight: '700', marginBottom: 4 }}>📋 ADDRESS PREVIEW</Text>
-                  <Text style={{ color: C.text, fontSize: 13, lineHeight: 20 }}>{addrBarangay.name}, {addrCity?.name}, {addrProvince?.name}, {addrRegion?.name}, Philippines</Text>
-                </View>
-              )}
-              <View style={{ flexDirection: 'row', gap: 12, paddingBottom: 8 }}>
-                <TouchableOpacity style={{ flex: 1, paddingVertical: 14, borderRadius: 12, borderWidth: 1.5, borderColor: C.border, alignItems: 'center' }} onPress={() => setShowAddrPicker(false)}><Text style={{ color: C.sub, fontWeight: '700' }}>Cancel</Text></TouchableOpacity>
-                <TouchableOpacity style={{ flex: 2, paddingVertical: 14, borderRadius: 12, backgroundColor: addrBarangay ? C.teal : C.border, alignItems: 'center', elevation: addrBarangay ? 2 : 0 }} onPress={saveAddress} disabled={!addrBarangay}><Text style={{ color: addrBarangay ? '#fff' : C.sub, fontWeight: '800' }}>💾 Save Address</Text></TouchableOpacity>
-              </View>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-    );
-  };
-
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }} scrollEnabled={phase !== 'form'}>
@@ -650,7 +517,6 @@ export default function Registration() {
       </ScrollView>
       {renderDatePicker()}
       {renderBdayPicker()}
-      {renderAddrPicker()}
     </View>
   );
 }

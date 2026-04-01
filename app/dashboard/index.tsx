@@ -35,9 +35,11 @@ export default function DashboardScreen() {
   const { username, darkMode, avatarUri } = useUser();
   const dark = darkMode;
 
-  const [refreshing, setRefreshing] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expectExpanded, setExpectExpanded] = useState(false);
+  const [refreshing, setRefreshing]               = useState(false);
+  const [sidebarOpen, setSidebarOpen]             = useState(false);
+  const [expectExpanded, setExpectExpanded]       = useState(false);
+  const [remindersExpanded, setRemindersExpanded] = useState(false);
+  const [vaccineExpanded, setVaccineExpanded]     = useState(false);
 
   const headerBg = dark ? '#1a2e2c' : '#2BAF9E';
 
@@ -48,22 +50,13 @@ export default function DashboardScreen() {
     sub:       dark ? '#7aada8' : '#6b7280',
     border:    dark ? '#2e3837' : '#e0eeec',
     teal:      '#2BAF9E',
-    tealDark:  '#1b7b6b',
     tealLight: dark ? '#1e3330' : '#e6f7f5',
     divider:   dark ? '#2e3837' : '#f0f0f0',
   };
 
-  const refreshData = () => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 500);
-  };
-
+  const refreshData = () => { setRefreshing(true); setTimeout(() => setRefreshing(false), 500); };
   const handleLogout = () => router.replace('/login');
-
-  const toggleExpect = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setExpectExpanded(prev => !prev);
-  };
+  const toggle = (setter: React.Dispatch<React.SetStateAction<boolean>>) => { LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut); setter(prev => !prev); };
 
   const quickActions = [
     { label: 'Register\nPatient', emoji: '🏥', color: '#43a047', bg: dark ? '#1a3320' : '#e8f5e9', onPress: () => router.push('/registration' as any) },
@@ -71,11 +64,24 @@ export default function DashboardScreen() {
     { label: 'Vaccine\nInfo',    emoji: '💉', color: '#f57c00', bg: dark ? '#2d1f0e' : '#fff3e0', onPress: () => router.push('/information') },
   ];
 
+  const CardHeader = ({ iconBg, icon, title, expanded, onToggle }: { iconBg: string; icon: string; title: string; expanded: boolean; onToggle: () => void }) => (
+    <TouchableOpacity onPress={onToggle} activeOpacity={0.8}>
+      <View style={styles.cardRowHeader}>
+        <View style={[styles.cardIconWrap, { backgroundColor: iconBg }]}>
+          <Text style={{ fontSize: 18 }}>{icon}</Text>
+        </View>
+        <Text style={[styles.cardTitle, { color: C.text, flex: 1 }]}>{title}</Text>
+        <Text style={{ color: C.teal, fontSize: 13, fontWeight: '700', marginRight: 16 }}>
+          {expanded ? '▲' : '▼'}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
     <SafeAreaView style={[styles.root, { backgroundColor: headerBg }]} edges={['top', 'left', 'right']}>
       <StatusBar translucent={false} backgroundColor={headerBg} barStyle="light-content" />
 
-      {/* Sidebar Modal */}
       <Modal visible={sidebarOpen} transparent={true} animationType="fade">
         <View style={styles.sidebarContainer}>
           <View style={[styles.sidebar, { backgroundColor: '#26a69a' }]}>
@@ -107,7 +113,6 @@ export default function DashboardScreen() {
         </View>
       </Modal>
 
-      {/* ── Header ── */}
       <View style={[styles.header, { backgroundColor: headerBg }]}>
         <TouchableOpacity onPress={() => setSidebarOpen(true)} style={styles.menuBtnWrap} activeOpacity={0.7}>
           <Text style={styles.menuButton}>☰</Text>
@@ -127,23 +132,12 @@ export default function DashboardScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* ── Main Scroll ── */}
       <View style={{ flex: 1, backgroundColor: C.bg }}>
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 32 }}
-          scrollEnabled={!sidebarOpen}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refreshData} />}
-        >
-          {/* Quick Action Buttons */}
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }} scrollEnabled={!sidebarOpen} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refreshData} />}>
+
           <View style={[styles.quickActionsRow, { backgroundColor: headerBg }]}>
             {quickActions.map((action, i) => (
-              <TouchableOpacity
-                key={i}
-                style={[styles.quickActionBtn, { backgroundColor: action.bg }]}
-                onPress={action.onPress}
-                activeOpacity={0.82}
-              >
+              <TouchableOpacity key={i} style={[styles.quickActionBtn, { backgroundColor: action.bg }]} onPress={action.onPress} activeOpacity={0.82}>
                 <View style={[styles.quickActionIconWrap, { backgroundColor: action.color }]}>
                   <Text style={{ fontSize: 22 }}>{action.emoji}</Text>
                 </View>
@@ -154,7 +148,7 @@ export default function DashboardScreen() {
 
           <View style={styles.contentPadding}>
 
-            {/* Today's Status */}
+            {/* Today's Status — always open */}
             <View style={[styles.card, { backgroundColor: C.card, marginBottom: 12 }]}>
               <View style={styles.cardRowHeader}>
                 <View style={[styles.cardIconWrap, { backgroundColor: '#e3f2fd' }]}>
@@ -163,69 +157,41 @@ export default function DashboardScreen() {
                 <Text style={[styles.cardTitle, { color: C.text }]}>Today's Status</Text>
               </View>
               <View style={[styles.divider, { backgroundColor: C.divider }]} />
-              <View style={{ paddingBottom: 8 }}>
-                <CenterStatusBanner />
-              </View>
+              <View style={{ paddingBottom: 8 }}><CenterStatusBanner /></View>
             </View>
 
             {/* What to Expect */}
             <View style={[styles.card, { backgroundColor: C.card, marginBottom: 12 }]}>
-              <TouchableOpacity onPress={toggleExpect} activeOpacity={0.8}>
-                <View style={styles.cardRowHeader}>
-                  <View style={[styles.cardIconWrap, { backgroundColor: '#fff3e0' }]}>
-                    <Text style={{ fontSize: 18 }}>📋</Text>
-                  </View>
-                  <Text style={[styles.cardTitle, { color: C.text, flex: 1 }]}>What to Expect</Text>
-                  <Text style={{ color: C.teal, fontSize: 13, fontWeight: '700', marginRight: 16 }}>
-                    {expectExpanded ? '▲' : '▼'}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-
+              <CardHeader iconBg="#fff3e0" icon="📋" title="What to Expect" expanded={expectExpanded} onToggle={() => toggle(setExpectExpanded)} />
               {!expectExpanded ? (
                 <>
                   <View style={[styles.divider, { backgroundColor: C.divider }]} />
-                  <View style={{ paddingTop: 4, paddingBottom: 4 }}>
-                    {['Register at entrance', 'Get classified (Cat 2 or Cat 3)', 'Receive vaccine'].map((item, i) => (
-                      <View key={i} style={styles.bulletRow}>
-                        <View style={[styles.bullet, { backgroundColor: C.teal }]} />
-                        <Text style={[styles.bulletText, { color: C.sub }]}>{item}</Text>
-                      </View>
-                    ))}
-                  </View>
-                  <TouchableOpacity
-                    style={[styles.viewDetailsBtn, { backgroundColor: C.tealLight }]}
-                    onPress={toggleExpect}
-                    activeOpacity={0.8}
-                  >
+                  {['Register at entrance', 'Get classified (Cat 2 or Cat 3)', 'Receive vaccine'].map((item, i) => (
+                    <View key={i} style={styles.bulletRow}>
+                      <View style={[styles.bullet, { backgroundColor: C.teal }]} />
+                      <Text style={[styles.bulletText, { color: C.sub }]}>{item}</Text>
+                    </View>
+                  ))}
+                  <TouchableOpacity style={[styles.viewDetailsBtn, { backgroundColor: C.tealLight }]} onPress={() => toggle(setExpectExpanded)} activeOpacity={0.8}>
                     <Text style={[styles.viewDetailsBtnText, { color: C.teal }]}>View Details →</Text>
                   </TouchableOpacity>
                 </>
               ) : (
                 <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
                   <View style={[styles.divider, { backgroundColor: C.divider, marginHorizontal: 0, marginBottom: 12 }]} />
-
                   <Text style={[styles.expectSectionTitle, { color: C.teal }]}>🏥 First-Time Patients</Text>
                   <Text style={[styles.expectText, { color: C.sub }]}>• Arrive before 8:00 AM and line up at the ABTC-CHO entrance.</Text>
                   <Text style={[styles.expectText, { color: C.sub }]}>• Registration starts at 8:00 AM or 8:30 AM.</Text>
                   <Text style={[styles.expectText, { color: C.sub }]}>• You will be assessed and classified as Category 2 or Category 3.</Text>
-
                   <Text style={[styles.expectSectionTitle, { color: '#1e88e5', marginTop: 10 }]}>📌 Category 2 Patients</Text>
                   <Text style={[styles.expectText, { color: C.sub }]}>• Proceed to the front desk for second verification. Your name will be queued for processing.</Text>
                   <Text style={[styles.expectText, { color: C.sub }]}>• Assist with your PhilHealth form (provided by ABTC-CHO) before being queued for vaccine administration.</Text>
-
                   <Text style={[styles.expectSectionTitle, { color: '#f57c00', marginTop: 10 }]}>📌 Category 3 Patients</Text>
                   <Text style={[styles.expectText, { color: C.sub }]}>• You'll be paired with another Cat 3 patient to share the cost of one ARV vial. Purchase vial + 2 syringes (per patient) from Mercury Drugstore.</Text>
                   <Text style={[styles.expectText, { color: C.sub }]}>• Return to front desk, submit items, and both names will be queued for administration.</Text>
-
                   <Text style={[styles.expectSectionTitle, { color: '#43a047', marginTop: 10 }]}>💉 Booster Shot Patients</Text>
                   <Text style={[styles.expectText, { color: C.sub }]}>• Proceed to the registration area with your Vaccination Card for verification.</Text>
-
-                  <TouchableOpacity
-                    style={[styles.viewDetailsBtn, { backgroundColor: C.tealLight, marginTop: 14, marginHorizontal: 0 }]}
-                    onPress={toggleExpect}
-                    activeOpacity={0.8}
-                  >
+                  <TouchableOpacity style={[styles.viewDetailsBtn, { backgroundColor: C.tealLight, marginTop: 14, marginHorizontal: 0 }]} onPress={() => toggle(setExpectExpanded)} activeOpacity={0.8}>
                     <Text style={[styles.viewDetailsBtnText, { color: C.teal }]}>▲ Hide Details</Text>
                   </TouchableOpacity>
                 </View>
@@ -234,19 +200,32 @@ export default function DashboardScreen() {
 
             {/* Reminders */}
             <View style={[styles.card, { backgroundColor: C.card, marginBottom: 12 }]}>
-              <View style={styles.cardRowHeader}>
-                <View style={[styles.cardIconWrap, { backgroundColor: '#fff3e0' }]}>
-                  <Text style={{ fontSize: 18 }}>🕐</Text>
-                </View>
-                <Text style={[styles.cardTitle, { color: C.text }]}>Reminders</Text>
-              </View>
-              <View style={[styles.divider, { backgroundColor: C.divider }]} />
-              <View style={{ paddingBottom: 8 }}>
-                <Reminders />
-              </View>
+              <CardHeader iconBg="#fff3e0" icon="🕐" title="Reminders" expanded={remindersExpanded} onToggle={() => toggle(setRemindersExpanded)} />
+              {!remindersExpanded ? (
+                <>
+                  <View style={[styles.divider, { backgroundColor: C.divider }]} />
+                  {['What to bring for 1st dose', 'What to bring for 2nd & 3rd dose', 'Pro tips for your visit'].map((item, i) => (
+                    <View key={i} style={styles.bulletRow}>
+                      <View style={[styles.bullet, { backgroundColor: C.teal }]} />
+                      <Text style={[styles.bulletText, { color: C.sub }]}>{item}</Text>
+                    </View>
+                  ))}
+                  <TouchableOpacity style={[styles.viewDetailsBtn, { backgroundColor: C.tealLight }]} onPress={() => toggle(setRemindersExpanded)} activeOpacity={0.8}>
+                    <Text style={[styles.viewDetailsBtnText, { color: C.teal }]}>View Details →</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <View style={[styles.divider, { backgroundColor: C.divider }]} />
+                  <View style={{ paddingBottom: 8 }}><Reminders /></View>
+                  <TouchableOpacity style={[styles.viewDetailsBtn, { backgroundColor: C.tealLight }]} onPress={() => toggle(setRemindersExpanded)} activeOpacity={0.8}>
+                    <Text style={[styles.viewDetailsBtnText, { color: C.teal }]}>▲ Hide Details</Text>
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
 
-            {/* Anti-Rabies Vaccine */}
+            {/* Anti-Rabies Vaccine — always open */}
             <View style={[styles.card, { backgroundColor: C.card, marginBottom: 12 }]}>
               <View style={styles.cardRowHeader}>
                 <View style={[styles.cardIconWrap, { backgroundColor: '#fce4ec' }]}>
@@ -259,30 +238,40 @@ export default function DashboardScreen() {
                 <View style={[styles.bullet, { backgroundColor: '#e53935' }]} />
                 <Text style={[styles.bulletText, { color: C.sub }]}>3-dose series required</Text>
               </View>
-              <TouchableOpacity
-                style={[styles.viewDetailsBtn, { backgroundColor: C.tealLight }]}
-                onPress={() => router.push('/schedule')}
-                activeOpacity={0.8}
-              >
+              <TouchableOpacity style={[styles.viewDetailsBtn, { backgroundColor: C.tealLight }]} onPress={() => router.push('/schedule')} activeOpacity={0.8}>
                 <Text style={[styles.viewDetailsBtnText, { color: C.teal }]}>View Schedule →</Text>
               </TouchableOpacity>
             </View>
 
             {/* Vaccine List */}
             <View style={[styles.card, { backgroundColor: C.card, marginBottom: 4 }]}>
-              <View style={styles.cardRowHeader}>
-                <View style={[styles.cardIconWrap, { backgroundColor: '#e8f5e9' }]}>
-                  <Text style={{ fontSize: 18 }}>📋</Text>
-                </View>
-                <Text style={[styles.cardTitle, { color: C.text }]}>Vaccine List</Text>
-              </View>
-              <View style={[styles.divider, { backgroundColor: C.divider }]} />
-              <VaccineList />
+              <CardHeader iconBg="#e8f5e9" icon="📋" title="Vaccine List" expanded={vaccineExpanded} onToggle={() => toggle(setVaccineExpanded)} />
+              {!vaccineExpanded ? (
+                <>
+                  <View style={[styles.divider, { backgroundColor: C.divider }]} />
+                  {['Anti-Rabies Vaccine (ARV)', 'BCG, Hepatitis B, MMR', 'Polio, DPT, Varicella'].map((item, i) => (
+                    <View key={i} style={styles.bulletRow}>
+                      <View style={[styles.bullet, { backgroundColor: C.teal }]} />
+                      <Text style={[styles.bulletText, { color: C.sub }]}>{item}</Text>
+                    </View>
+                  ))}
+                  <TouchableOpacity style={[styles.viewDetailsBtn, { backgroundColor: C.tealLight }]} onPress={() => toggle(setVaccineExpanded)} activeOpacity={0.8}>
+                    <Text style={[styles.viewDetailsBtnText, { color: C.teal }]}>View List →</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <View style={[styles.divider, { backgroundColor: C.divider }]} />
+                  <VaccineList />
+                  <TouchableOpacity style={[styles.viewDetailsBtn, { backgroundColor: C.tealLight }]} onPress={() => toggle(setVaccineExpanded)} activeOpacity={0.8}>
+                    <Text style={[styles.viewDetailsBtnText, { color: C.teal }]}>▲ Hide List</Text>
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
 
           </View>
 
-          {/* Footer */}
           <View style={[styles.footer, { borderTopColor: C.border }]}>
             <Text style={[styles.footerText, { color: C.sub }]}>Animal Bite Treatment Center</Text>
             <Text style={[styles.footerSubtext, { color: C.sub }]}>City Health Office • Cagayan de Oro City, Misamis Oriental</Text>
@@ -295,8 +284,6 @@ export default function DashboardScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-
-  // Sidebar
   sidebarContainer: { flex: 1, flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.5)' },
   sidebar: { width: Dimensions.get('window').width * 0.75, paddingTop: 50, paddingHorizontal: 16, height: '100%' },
   sidebarOverlay: { flex: 1 },
@@ -310,15 +297,7 @@ const styles = StyleSheet.create({
   sidebarItemText: { fontSize: 14, color: '#fff', fontWeight: '500' },
   logoutItem: { marginTop: 20, backgroundColor: '#ff6b6b' },
   logoutItemText: { fontSize: 14, color: '#fff', fontWeight: '600' },
-
-  // Header
-  header: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+  header: { paddingVertical: 14, paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   menuBtnWrap: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 8, width: 36, height: 36, justifyContent: 'center', alignItems: 'center' },
   menuButton: { fontSize: 20, color: '#ffffff', fontWeight: 'bold' },
   headerCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -327,88 +306,23 @@ const styles = StyleSheet.create({
   headerAvatar: { width: 38, height: 38, borderRadius: 19, borderWidth: 2, borderColor: 'rgba(255,255,255,0.5)' },
   headerAvatarPlaceholder: { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(255,255,255,0.2)', borderWidth: 2, borderColor: 'rgba(255,255,255,0.5)', justifyContent: 'center', alignItems: 'center' },
   headerAvatarLetter: { fontSize: 16, color: '#ffffff', fontWeight: '700' },
-
-  // Quick Actions
-  quickActionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 20,
-    gap: 10,
-  },
-  quickActionBtn: {
-    flex: 1,
-    borderRadius: 16,
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 6,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-  },
-  quickActionIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  quickActionLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    textAlign: 'center',
-    lineHeight: 16,
-  },
-
-  // Content
+  quickActionsRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 20, gap: 10 },
+  quickActionBtn: { flex: 1, borderRadius: 16, alignItems: 'center', paddingVertical: 14, paddingHorizontal: 6, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4 },
+  quickActionIconWrap: { width: 48, height: 48, borderRadius: 14, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
+  quickActionLabel: { fontSize: 12, fontWeight: '700', textAlign: 'center', lineHeight: 16 },
   contentPadding: { padding: 16, paddingTop: 16 },
-
-  // Card
-  card: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-  },
-  cardRowHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
+  card: { borderRadius: 16, overflow: 'hidden', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 6 },
+  cardRowHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 14 },
   cardIconWrap: { width: 36, height: 36, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
   cardTitle: { fontSize: 15, fontWeight: '700' },
   divider: { height: 1, marginHorizontal: 16 },
-
-  // Bullets
   bulletRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 6 },
   bullet: { width: 7, height: 7, borderRadius: 4 },
   bulletText: { fontSize: 13, flex: 1 },
-
-  // View Details Button
-  viewDetailsBtn: {
-    marginHorizontal: 16,
-    marginBottom: 14,
-    marginTop: 4,
-    borderRadius: 10,
-    paddingVertical: 11,
-    alignItems: 'center',
-  },
+  viewDetailsBtn: { marginHorizontal: 16, marginBottom: 14, marginTop: 4, borderRadius: 10, paddingVertical: 11, alignItems: 'center' },
   viewDetailsBtnText: { fontWeight: '700', fontSize: 13 },
-
-  // What to Expect
   expectSectionTitle: { fontSize: 13, fontWeight: '800', marginBottom: 4 },
   expectText: { fontSize: 12, lineHeight: 18, marginBottom: 3 },
-
-  // Footer
   footer: { paddingVertical: 16, paddingHorizontal: 16, borderTopWidth: 1, alignItems: 'center', marginTop: 4 },
   footerText: { fontSize: 11, fontWeight: '600' },
   footerSubtext: { fontSize: 10, marginTop: 3 },
