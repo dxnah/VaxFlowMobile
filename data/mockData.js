@@ -20,3 +20,11 @@ export const users = [
   { id: 2, username: 'patient2', password: 'pass456',    name: 'Maria Santos',      role: 'patient' },
   { id: 3, username: 'patient3', password: 'pass789',    name: 'Jose Reyes',        role: 'patient' },
 ];
+
+
+export const vaccinationRecords = [
+  { id: 1, vaccine: 'Anti-Rabies Vaccine (ARV)', dose: '1st Dose', date: 'January 15, 2025', facility: 'ABTC - City Health Office', administered: 'Dr. Santos',  color: '#e53935', cardImage: null },
+  { id: 2, vaccine: 'Anti-Rabies Vaccine (ARV)', dose: '2nd Dose', date: 'January 22, 2025', facility: 'ABTC - City Health Office', administered: 'Dr. Santos',  color: '#e53935', cardImage: null },
+  { id: 3, vaccine: 'BCG',                       dose: '1st Dose', date: 'March 3, 2025',    facility: 'City Health Office, CDO',  administered: 'Nurse Reyes', color: '#1e88e5', cardImage: null },
+  { id: 4, vaccine: 'Hepatitis B',               dose: '1st Dose', date: 'March 10, 2025',   facility: 'City Health Office, CDO',  administered: 'Nurse Cruz',  color: '#f57c00', cardImage: null },
+];
