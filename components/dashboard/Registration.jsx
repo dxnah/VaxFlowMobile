@@ -1,26 +1,17 @@
-// components/dashboard/Registration.jsx
-
 import React, { useState } from 'react';
 import {
-    Alert,
-    KeyboardAvoidingView,
-    LayoutAnimation,
-    Modal,
-    Platform,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    UIManager,
-    View
+  Alert,
+  KeyboardAvoidingView,
+  LayoutAnimation,
+  Modal,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { useUser } from '../../context/UserContext';
-
-if (Platform.OS === 'android') {
-  UIManager.setLayoutAnimationEnabledExperimental?.(true);
-}
-
-
 
 const QUESTIONS = [
   { id: 1, key: 'incidentDate',     type: 'date',   label: 'Q1. When did this happen?',                                    placeholder: 'Tap the calendar to set a date.' },
@@ -70,6 +61,21 @@ export default function Registration({ onDone }) {
     orange:    '#ff9800',
   };
 
+  // ✅ Fix 2: Dark-mode colours for the "paper" registration form card
+  const paper = {
+    bg:          dark ? '#1e2928' : '#ffffff',
+    border:      dark ? '#2e3837' : '#dddddd',
+    headerBg:    dark ? '#1a2e2c' : '#ffffff',
+    divider:     dark ? '#2BAF9E' : '#2BAF9E',
+    sectionLabel: '#2BAF9E',
+    labelText:   dark ? '#7aada8' : '#888888',
+    valueText:   dark ? '#e8f0ef' : '#1a2e2c',
+    titleText:   dark ? '#e8f0ef' : '#1a2e2c',
+    subtitleText: dark ? '#7aada8' : '#aaaaaa',
+    footerText:  dark ? '#4a6b68' : '#bbbbbb',
+    rowBorder:   dark ? '#2e3837' : '#eeeeee',
+  };
+
   const [phase, setPhase]           = useState('list');
   const [currentQ, setCurrentQ]     = useState(0);
   const [answers, setAnswers]        = useState({});
@@ -82,7 +88,6 @@ export default function Registration({ onDone }) {
   const [editing, setEditing]  = useState(false);
   const [savedList, setSavedList]         = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(null);
-
 
   const [showBdayPicker, setShowBdayPicker] = useState(false);
   const [bdYear,  setBdYear]  = useState(2000);
@@ -154,22 +159,6 @@ export default function Registration({ onDone }) {
   const confirmDate = () => { if (!dpDay) return; setAnswers(prev => ({ ...prev, incidentDate: `${MONTHS[dpMonth]} ${String(dpDay).padStart(2, '0')}, ${dpYear}` })); setShowDatePicker(false); setDpDay(null); };
   const clearDate = () => { animate(); setAnswers(prev => ({ ...prev, incidentDate: null })); };
 
-  const QRDisplay = ({ data }) => (
-    <View style={{ alignItems: 'center', padding: 16 }}>
-      <View style={{ width: 200, height: 200, backgroundColor: '#fff', padding: 12, borderRadius: 8, borderWidth: 2, borderColor: C.teal, justifyContent: 'center', alignItems: 'center' }}>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', width: 176, height: 176 }}>
-          {Array.from({ length: 22 * 22 }).map((_, i) => {
-            const row = Math.floor(i / 22); const col = i % 22;
-            const isCorner = (row < 7 && col < 7) || (row < 7 && col > 14) || (row > 14 && col < 7);
-            const hash = (data.length * (i + 1) * 7 + row * 13 + col * 17) % 3;
-            return <View key={i} style={{ width: 8, height: 8, backgroundColor: (isCorner || hash === 0) ? '#1a1a1a' : '#ffffff' }} />;
-          })}
-        </View>
-      </View>
-      <Text style={{ color: C.sub, fontSize: 10, marginTop: 8, textAlign: 'center' }}>Scan this QR code at the front desk for verification</Text>
-    </View>
-  );
-
   const renderList = () => {
     return (
       <View style={{ padding: 20 }}>
@@ -220,7 +209,6 @@ export default function Registration({ onDone }) {
                 </TouchableOpacity>
               );
             })}
-
           </View>
         )}
       </View>
@@ -354,7 +342,6 @@ export default function Registration({ onDone }) {
             </View>
           </View>
 
-          {/* ✅ Simple text address field */}
           <Field C={C} label="Address" icon="🏠" value={form.address} onChangeText={(v) => setForm(p => ({ ...p, address: v }))} placeholder="e.g. Brgy. Carmen, Cagayan de Oro City" multiline />
 
           <Field C={C} label="Contact Number" icon="📞" value={form.contact} onChangeText={(v) => setForm(p => ({ ...p, contact: v }))} placeholder="e.g. 09123456789" keyboardType="phone-pad" />
@@ -377,38 +364,65 @@ export default function Registration({ onDone }) {
     if (!entry) { setPhase('list'); return null; }
     const { form: f, answers: a } = entry;
     const queueNumber = `Q-${String(selectedIndex + 1).padStart(3, '0')}`;
+
+    // ✅ Fix 2: Row now uses `paper` palette so it adapts to dark mode
     const Row = ({ label, value }) => (
-      <View style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: C.border }}>
-        <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 2 }}>{label}</Text>
-        <Text style={{ color: C.text, fontSize: 14, fontWeight: '600' }}>{value || '—'}</Text>
+      <View style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: paper.rowBorder }}>
+        <Text style={{ color: paper.labelText, fontSize: 10, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 2 }}>{label}</Text>
+        <Text style={{ color: paper.valueText, fontSize: 14, fontWeight: '600' }}>{value || '—'}</Text>
       </View>
     );
+
     return (
       <View style={{ padding: 20 }}>
         <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 14, alignSelf: 'flex-start' }} onPress={() => { animate(); setPhase('list'); setSelectedIndex(null); }} activeOpacity={0.8}>
           <Text style={{ color: C.teal, fontSize: 13, fontWeight: '700' }}>← Back to Registrations</Text>
         </TouchableOpacity>
-        <View style={{ backgroundColor: '#ffffff', borderRadius: 4, padding: 24, borderWidth: 1, borderColor: '#ddd', elevation: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, marginBottom: 16 }}>
-          <View style={{ alignItems: 'center', borderBottomWidth: 2, borderBottomColor: '#2BAF9E', paddingBottom: 14, marginBottom: 16 }}>
-            <Text style={{ fontSize: 11, color: '#888', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4 }}>Animal Bite Treatment Center</Text>
-            <Text style={{ fontSize: 16, fontWeight: '900', color: '#1a2e2c', letterSpacing: 0.5 }}>PATIENT REGISTRATION FORM</Text>
-            <Text style={{ fontSize: 10, color: '#aaa', marginTop: 2 }}>City Health Office • Cagayan de Oro City</Text>
+
+        {/* ✅ Fix 2: Paper card now uses `paper` palette — fully dark-mode aware */}
+        <View style={{
+          backgroundColor: paper.bg,
+          borderRadius: 4,
+          padding: 24,
+          borderWidth: 1,
+          borderColor: paper.border,
+          elevation: 6,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.15,
+          shadowRadius: 12,
+          marginBottom: 16,
+        }}>
+          <View style={{
+            alignItems: 'center',
+            borderBottomWidth: 2,
+            borderBottomColor: paper.divider,
+            paddingBottom: 14,
+            marginBottom: 16,
+          }}>
+            <Text style={{ fontSize: 11, color: paper.labelText, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4 }}>Animal Bite Treatment Center</Text>
+            <Text style={{ fontSize: 16, fontWeight: '900', color: paper.titleText, letterSpacing: 0.5 }}>PATIENT REGISTRATION FORM</Text>
+            <Text style={{ fontSize: 10, color: paper.subtitleText, marginTop: 2 }}>City Health Office • Cagayan de Oro City</Text>
           </View>
-          <Text style={{ fontSize: 12, fontWeight: '800', color: '#2BAF9E', letterSpacing: 1, marginBottom: 8 }}>PERSONAL INFORMATION</Text>
+
+          <Text style={{ fontSize: 12, fontWeight: '800', color: paper.sectionLabel, letterSpacing: 1, marginBottom: 8 }}>PERSONAL INFORMATION</Text>
           <Row label="Full Name"      value={f.fullName} />
           <Row label="Age"            value={f.age} />
           <Row label="Birthdate"      value={f.birthdate} />
           <Row label="Address"        value={f.address} />
           <Row label="Contact Number" value={f.contact} />
-          <Text style={{ fontSize: 12, fontWeight: '800', color: '#2BAF9E', letterSpacing: 1, marginTop: 16, marginBottom: 8 }}>INCIDENT DETAILS</Text>
+
+          <Text style={{ fontSize: 12, fontWeight: '800', color: paper.sectionLabel, letterSpacing: 1, marginTop: 16, marginBottom: 8 }}>INCIDENT DETAILS</Text>
           <Row label="Date of Incident"      value={a.incidentDate} />
           <Row label="Type of Injury"        value={a.injuryType} />
           <Row label="Animal Involved"       value={a.animalType} />
           <Row label="Animal Owner"          value={a.animalOwner} />
           <Row label="Animal Vaccinated"     value={a.animalVaccinated} />
           <Row label="Body Part(s) Affected" value={a.bodyPart} />
-          <Text style={{ fontSize: 9, color: '#bbb', textAlign: 'center', marginTop: 16 }}>This form is for ABTC-CHO use only.</Text>
+
+          <Text style={{ fontSize: 9, color: paper.footerText, textAlign: 'center', marginTop: 16 }}>This form is for ABTC-CHO use only.</Text>
         </View>
+
         {/* Queue Number Card */}
         <View style={{ backgroundColor: C.card, borderRadius: 16, borderWidth: 1, borderColor: C.border, overflow: 'hidden', marginBottom: 16 }}>
           <View style={{ backgroundColor: C.teal, padding: 12, alignItems: 'center' }}>
@@ -425,6 +439,7 @@ export default function Registration({ onDone }) {
             </Text>
           </View>
         </View>
+
         <View style={{ flexDirection: 'row', gap: 12, marginBottom: 8 }}>
           <TouchableOpacity style={{ flex: 1, paddingVertical: 14, borderRadius: 12, borderWidth: 1.5, borderColor: C.red, alignItems: 'center', backgroundColor: dark ? '#2d1a1a' : '#ffebee' }} onPress={() => handleDelete(selectedIndex)} activeOpacity={0.8}>
             <Text style={{ color: C.red, fontWeight: '700' }}>🗑️ Delete</Text>

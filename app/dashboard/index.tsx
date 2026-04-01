@@ -1,5 +1,3 @@
-// app/dashboard/index.tsx
-
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -14,7 +12,6 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  UIManager,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,10 +23,6 @@ import { useUser } from '../../context/UserContext';
 const STATUS_BAR_HEIGHT =
   Platform.OS === "android" ? (StatusBar.currentHeight ?? 24) : 0;
 
-if (Platform.OS === 'android') {
-  UIManager.setLayoutAnimationEnabledExperimental?.(true);
-}
-
 export default function DashboardScreen() {
   const router = useRouter();
   const { username, darkMode, avatarUri } = useUser();
@@ -37,6 +30,7 @@ export default function DashboardScreen() {
 
   const [refreshing, setRefreshing]               = useState(false);
   const [sidebarOpen, setSidebarOpen]             = useState(false);
+  const [logoutModalOpen, setLogoutModalOpen]     = useState(false);
   const [expectExpanded, setExpectExpanded]       = useState(false);
   const [remindersExpanded, setRemindersExpanded] = useState(false);
   const [vaccineExpanded, setVaccineExpanded]     = useState(false);
@@ -55,7 +49,7 @@ export default function DashboardScreen() {
   };
 
   const refreshData = () => { setRefreshing(true); setTimeout(() => setRefreshing(false), 500); };
-  const handleLogout = () => router.replace('/login');
+  const handleLogout = () => { setLogoutModalOpen(false); router.replace('/login'); };
   const toggle = (setter: React.Dispatch<React.SetStateAction<boolean>>) => { LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut); setter(prev => !prev); };
 
   const quickActions = [
@@ -82,6 +76,7 @@ export default function DashboardScreen() {
     <SafeAreaView style={[styles.root, { backgroundColor: headerBg }]} edges={['top', 'left', 'right']}>
       <StatusBar translucent={false} backgroundColor={headerBg} barStyle="light-content" />
 
+      {/* Sidebar Modal */}
       <Modal visible={sidebarOpen} transparent={true} animationType="fade">
         <View style={styles.sidebarContainer}>
           <View style={[styles.sidebar, { backgroundColor: '#26a69a' }]}>
@@ -113,6 +108,40 @@ export default function DashboardScreen() {
         </View>
       </Modal>
 
+      {/* Avatar Logout Modal */}
+      <Modal visible={logoutModalOpen} transparent={true} animationType="fade">
+        <TouchableOpacity
+          style={styles.logoutOverlay}
+          activeOpacity={1}
+          onPress={() => setLogoutModalOpen(false)}
+        >
+          <View style={[styles.logoutPopup, { backgroundColor: dark ? '#242b2a' : '#ffffff' }]}>
+            {/* Avatar + name header */}
+            <View style={styles.logoutPopupHeader}>
+              {avatarUri ? (
+                <Image source={{ uri: avatarUri }} style={styles.logoutPopupAvatar} />
+              ) : (
+                <View style={[styles.logoutPopupAvatarFallback, { backgroundColor: '#2BAF9E' }]}>
+                  <Text style={styles.logoutPopupAvatarLetter}>{username.charAt(0).toUpperCase()}</Text>
+                </View>
+              )}
+              <View style={{ marginLeft: 12 }}>
+                <Text style={[styles.logoutPopupName, { color: dark ? '#e8f0ef' : '#1a2e2c' }]}>{username}</Text>
+                <Text style={[styles.logoutPopupRole, { color: dark ? '#7aada8' : '#6b7280' }]}>Patient</Text>
+              </View>
+            </View>
+            <View style={[styles.logoutPopupDivider, { backgroundColor: dark ? '#2e3837' : '#e0eeec' }]} />
+            <TouchableOpacity
+              style={styles.logoutPopupBtn}
+              onPress={handleLogout}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.logoutPopupBtnText}>🚪  Logout</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
       <View style={[styles.header, { backgroundColor: headerBg }]}>
         <TouchableOpacity onPress={() => setSidebarOpen(true)} style={styles.menuBtnWrap} activeOpacity={0.7}>
           <Text style={styles.menuButton}>☰</Text>
@@ -121,7 +150,8 @@ export default function DashboardScreen() {
           <Text style={styles.greeting}>Hello, {username} 👋</Text>
           <Text style={styles.subheading}>ABTC-CHO Vaccine Status</Text>
         </View>
-        <TouchableOpacity onPress={() => router.push('/settings')} activeOpacity={0.8}>
+        {/* Avatar now opens logout popup, NOT settings */}
+        <TouchableOpacity onPress={() => setLogoutModalOpen(true)} activeOpacity={0.8}>
           {avatarUri ? (
             <Image source={{ uri: avatarUri }} style={styles.headerAvatar} />
           ) : (
@@ -297,6 +327,31 @@ const styles = StyleSheet.create({
   sidebarItemText: { fontSize: 14, color: '#fff', fontWeight: '500' },
   logoutItem: { marginTop: 20, backgroundColor: '#ff6b6b' },
   logoutItemText: { fontSize: 14, color: '#fff', fontWeight: '600' },
+
+  // Avatar logout popup
+  logoutOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-start', alignItems: 'flex-end' },
+  logoutPopup: {
+    marginTop: Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) + 60 : 60,
+    marginRight: 12,
+    borderRadius: 16,
+    paddingVertical: 8,
+    width: 220,
+    elevation: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+  },
+  logoutPopupHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 },
+  logoutPopupAvatar: { width: 40, height: 40, borderRadius: 20 },
+  logoutPopupAvatarFallback: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
+  logoutPopupAvatarLetter: { fontSize: 18, color: '#fff', fontWeight: '700' },
+  logoutPopupName: { fontSize: 14, fontWeight: '700' },
+  logoutPopupRole: { fontSize: 11, marginTop: 1 },
+  logoutPopupDivider: { height: 1, marginHorizontal: 0 },
+  logoutPopupBtn: { paddingHorizontal: 16, paddingVertical: 14 },
+  logoutPopupBtnText: { fontSize: 14, color: '#e53935', fontWeight: '700' },
+
   header: { paddingVertical: 14, paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   menuBtnWrap: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 8, width: 36, height: 36, justifyContent: 'center', alignItems: 'center' },
   menuButton: { fontSize: 20, color: '#ffffff', fontWeight: 'bold' },
