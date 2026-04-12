@@ -37,8 +37,8 @@ export default StyleSheet.create({
   inputField:      { flex: 1, fontSize: 14, color: '#333', paddingVertical: 12 },
   eyeBtn:          { padding: 4 },
 
-  forgotRow:       { alignSelf: 'flex-end', marginBottom: 20 },
-  forgotText:      { fontSize: 12, color: TEAL, fontWeight: '600' },
+  forgotRow: { alignSelf: 'center', marginTop: 12, marginBottom: 8 },
+  forgotText: { fontSize: 12, color: TEAL, fontWeight: '600' },
 
   // Login button
   loginButton:     { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: TEAL, borderRadius: 12, paddingVertical: 14, marginBottom: 12, shadowColor: TEAL, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 4 },

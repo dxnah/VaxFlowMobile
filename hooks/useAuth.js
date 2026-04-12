@@ -1,17 +1,19 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 
-const API_URL = 'http://192.168.1.245:8000/api'; 
+const API_URL = 'http://192.168.1.245:8000/api';
 
 export default function useAuth() {
   const router = useRouter();
-  const [error, setError] = useState("");
+  const [error,   setError]   = useState("");
+  const [loading, setLoading] = useState(false);
 
   const login = async (username, password) => {
     if (!username || !password) {
       setError('Username and password are required');
       return;
     }
+    setLoading(true);
     try {
       const response = await fetch(`${API_URL}/login/`, {
         method: 'POST',
@@ -27,6 +29,8 @@ export default function useAuth() {
       }
     } catch (err) {
       setError('Cannot connect to server.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -34,5 +38,5 @@ export default function useAuth() {
     router.push('/login');
   };
 
-  return { login, logout, error };
+  return { login, logout, error, loading };
 }
