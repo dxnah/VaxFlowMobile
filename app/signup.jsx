@@ -6,7 +6,7 @@ import styles from '../styles/login';
 
 const TEAL      = '#2BAF9E';
 const TEAL_DARK = '#1b7b6b';
-const API_URL   = 'http://192.168.1.245:8000/api'; 
+import BASE_URL from '../utils/api'; 
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -39,7 +39,7 @@ export default function SignupScreen() {
     }
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/signup/`, {
+      const response = await fetch(`${BASE_URL}/signup/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
