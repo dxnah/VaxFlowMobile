@@ -40,7 +40,7 @@ export default function Announcements() {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: dark ? '#e8f0ef' : '#333' }]}>📢 Announcements</Text>
+
       {announcements.length === 0 ? (
         <Text style={{ color: dark ? '#7aada8' : '#666', textAlign: 'center', padding: 16 }}>No announcements at this time.</Text>
       ) : (

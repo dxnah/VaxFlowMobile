@@ -43,9 +43,6 @@ export default function VaccineList() {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: dark ? '#e8f0ef' : '#333' }]}>
-        💉 Vaccines Available at ABTC-CHO
-      </Text>
       {vaccines.length === 0 ? (
         <Text style={{ color: dark ? '#7aada8' : '#666', textAlign: 'center', padding: 16 }}>No vaccines found.</Text>
       ) : (
