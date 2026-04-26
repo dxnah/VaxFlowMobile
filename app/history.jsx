@@ -1,13 +1,13 @@
 // app/history.jsx
 
 import * as ImagePicker from 'expo-image-picker';
-import React, { useState } from 'react';
-import { Alert, Image, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Image, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import SharedHeader from '../components/SharedHeader';
 import { useUser } from '../context/UserContext';
 import styles from '../styles/History';
-import { vaccinationRecords } from '../data/mockData';
+import BASE_URL from '../utils/api';
 
 function DigitalCard({ record, dark, onAddImage, onReplaceImage, onRemoveImage, onViewImage }) {
   const C = {
@@ -99,7 +99,8 @@ export default function HistoryScreen() {
   const { username, darkMode, avatarUri } = useUser();
   const dark = darkMode;
 
-  const [records, setRecords]           = useState(vaccinationRecords);
+  const [records, setRecords]           = useState([]);
+  const [loading, setLoading]           = useState(true);
   const [viewingImage, setViewingImage] = useState(null);
 
   const C = {
@@ -108,6 +109,34 @@ export default function HistoryScreen() {
     sub:    dark ? '#7aada8' : '#6b7280',
     card:   dark ? '#242b2a' : '#ffffff',
     border: dark ? '#2e3837' : '#e0efed',
+  };
+
+  useEffect(() => {
+    if (username) fetchHistory();
+  }, [username]);
+
+  const fetchHistory = async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/records/?patient=${username}`);
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        const mapped = data.map((item, index) => ({
+          id:           item.id,
+          vaccine:      item.vaccine_name || item.vaccine,
+          dose:         item.dose,
+          date:         item.date,
+          facility:     item.facility,
+          administered: item.administered_by,
+          cardImage:    null,
+          color:        ['#2BAF9E', '#1e88e5', '#43a047', '#f57c00', '#8e24aa'][index % 5],
+        }));
+        setRecords(mapped);
+      }
+    } catch (e) {
+      console.log('History fetch error:', e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const pickImage = async () => {
@@ -136,6 +165,17 @@ export default function HistoryScreen() {
   };
 
   const totalVaccines = [...new Set(records.map(r => r.vaccine))].length;
+
+  if (loading) {
+    return (
+      <SafeAreaView style={[styles.root, { backgroundColor: dark ? '#1a2e2c' : '#2BAF9E' }]} edges={['top', 'left', 'right']}>
+        <SharedHeader title="💉 Vaccination History" subtitle="Your digital vaccination records" />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: C.bg }}>
+          <ActivityIndicator size="large" color="#2BAF9E" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.root, { backgroundColor: dark ? '#1a2e2c' : '#2BAF9E' }]} edges={['top', 'left', 'right']}>
@@ -177,17 +217,26 @@ export default function HistoryScreen() {
           </View>
 
           <Text style={[styles.sectionTitle, { color: C.sub }]}>VACCINATION RECORDS</Text>
-          {records.map(record => (
-            <DigitalCard
-              key={record.id}
-              record={record}
-              dark={dark}
-              onAddImage={handleAddImage}
-              onReplaceImage={handleReplaceImage}
-              onRemoveImage={handleRemoveImage}
-              onViewImage={setViewingImage}
-            />
-          ))}
+
+          {records.length === 0 ? (
+            <View style={[styles.patientCard, { backgroundColor: C.card, borderColor: C.border, alignItems: 'center', padding: 32 }]}>
+              <Text style={{ fontSize: 48, marginBottom: 12 }}>💉</Text>
+              <Text style={[styles.patientName, { color: C.text, textAlign: 'center' }]}>No Records Yet</Text>
+              <Text style={[styles.patientSub, { color: C.sub, textAlign: 'center', marginTop: 4 }]}>Your vaccination history will appear here.</Text>
+            </View>
+          ) : (
+            records.map(record => (
+              <DigitalCard
+                key={record.id}
+                record={record}
+                dark={dark}
+                onAddImage={handleAddImage}
+                onReplaceImage={handleReplaceImage}
+                onRemoveImage={handleRemoveImage}
+                onViewImage={setViewingImage}
+              />
+            ))
+          )}
           <View style={{ height: 30 }} />
         </ScrollView>
       </View>
