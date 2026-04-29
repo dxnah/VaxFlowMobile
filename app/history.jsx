@@ -117,8 +117,21 @@ export default function HistoryScreen() {
 
   const fetchHistory = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/records/?patient=${username}`);
-      const data = await res.json();
+      // Step 1: Resolve username → numeric patient ID
+      const patientsRes = await fetch(`${BASE_URL}/patients/`);
+      const patients = await patientsRes.json();
+      const patient = patients.find(p => p.username === username);
+
+      if (!patient) {
+        console.log('Patient not found for username:', username);
+        setLoading(false);
+        return;
+      }
+
+      // Step 2: Fetch vaccination history by patient ID
+      const histRes = await fetch(`${BASE_URL}/vaccination-history/patient/${patient.id}/`);
+      const data = await histRes.json();
+
       if (Array.isArray(data) && data.length > 0) {
         const mapped = data.map((item, index) => ({
           id:           item.id,
