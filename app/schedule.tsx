@@ -24,6 +24,13 @@ interface Dose {
   optional?: boolean;
 }
 
+const DEFAULT_DOSES: Dose[] = [
+  { id: 1, name: "1st Dose", date: null, completed: false },
+  { id: 2, name: "2nd Dose", date: null, completed: false },
+  { id: 3, name: "3rd Dose", date: null, completed: false },
+  { id: 4, name: "Booster Shot", date: null, completed: false, optional: true },
+];
+
 const STATUS_BAR_HEIGHT =
   Platform.OS === "android" ? (StatusBar.currentHeight ?? 24) : 0;
 
@@ -48,7 +55,7 @@ export default function PatientScheduleScreen() {
     progressBg: dark ? "#2e3837" : "#e0f2ef",
   };
 
-  const [doses, setDoses] = useState<Dose[]>([]);
+  const [doses, setDoses] = useState<Dose[]>(DEFAULT_DOSES);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,8 +64,25 @@ export default function PatientScheduleScreen() {
 
   const fetchSchedule = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/schedules/?username=${username}`);
+      // Step 1: Get patient ID from username
+      const pRes = await fetch(`${BASE_URL}/patients/`);
+      const patients = await pRes.json();
+      const patient = Array.isArray(patients)
+        ? patients.find((p: any) => p.username === username)
+        : null;
+
+      if (!patient) {
+        setDoses(DEFAULT_DOSES);
+        setLoading(false);
+        return;
+      }
+
+      // Step 2: Fetch dose schedules using patient ID
+      const res = await fetch(
+        `${BASE_URL}/dose-schedules/patient/${patient.id}/`,
+      );
       const data = await res.json();
+
       if (Array.isArray(data) && data.length > 0) {
         const mapped = data.map((item: any) => ({
           id: item.id,
@@ -69,32 +93,11 @@ export default function PatientScheduleScreen() {
         }));
         setDoses(mapped);
       } else {
-        setDoses([
-          { id: 1, name: "1st Dose", date: null, completed: false },
-          { id: 2, name: "2nd Dose", date: null, completed: false },
-          { id: 3, name: "3rd Dose", date: null, completed: false },
-          {
-            id: 4,
-            name: "Booster Shot",
-            date: null,
-            completed: false,
-            optional: true,
-          },
-        ]);
+        setDoses(DEFAULT_DOSES);
       }
     } catch (e) {
-      setDoses([
-        { id: 1, name: "1st Dose", date: null, completed: false },
-        { id: 2, name: "2nd Dose", date: null, completed: false },
-        { id: 3, name: "3rd Dose", date: null, completed: false },
-        {
-          id: 4,
-          name: "Booster Shot",
-          date: null,
-          completed: false,
-          optional: true,
-        },
-      ]);
+      console.log("Schedule fetch error:", e);
+      setDoses(DEFAULT_DOSES);
     } finally {
       setLoading(false);
     }
