@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "vaxflow_mobile",
-    "slug": "vaxflow_mobile",
+    "name": "VaxFlow",
+    "slug": "VaxFlow",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logoit.png",
     "scheme": "vaxflowmobile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
