@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "VaxFlow",
-    "slug": "VaxFlow",
+    "slug": "vaxflow_mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logoit.png",
