@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { useUser } from '../../context/UserContext';
 import styles from '../../styles/VaccineList';
-import BASE_URL from '../../utils/api';
+import { useAuthFetch } from '../../utils/authFetch';
 
 const STATUS_COLOR = {
   'In Stock':  '#4caf50',
@@ -26,14 +26,14 @@ const VaccineCard = ({ name, status, available, dark }) => {
 };
 
 export default function VaccineList() {
+  const authFetch = useAuthFetch();
   const { darkMode } = useUser();
   const dark = darkMode;
   const [vaccines, setVaccines] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${BASE_URL}/vaccines/`)
-      .then(res => res.json())
+    authFetch('/vaccines/')
       .then(data => setVaccines(data))
       .catch(() => setVaccines([]))
       .finally(() => setLoading(false));

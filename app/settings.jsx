@@ -3,6 +3,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
+import useAuth from '../hooks/useAuth';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
@@ -21,6 +22,7 @@ import styles from '../styles/Settings';
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { logout } = useAuth();
   const { username, setUsername, darkMode, setDarkMode, avatarUri, setAvatarUri } = useUser();
 
   const [localUsername, setLocalUsername] = useState(username);
@@ -255,7 +257,7 @@ export default function SettingsScreen() {
               <View style={{ padding: 16 }}>
                 <TouchableOpacity
                   style={[styles.logoutBtn, { borderColor: C.red }]}
-                  onPress={() => router.push('/login')} activeOpacity={0.7}
+                  onPress={logout} activeOpacity={0.7}
                 >
                   <Ionicons name="log-out-outline" size={18} color={C.red} />
                   <Text style={[styles.logoutBtnText, { color: C.red }]}>Logout</Text>

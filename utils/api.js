@@ -1,5 +1,10 @@
 import Constants from 'expo-constants';
 
-const BASE_URL = Constants.expoConfig?.extra?.apiUrl ?? 'http://10.194.32.75:8000/api';
+// In development, use your local IP. For EAS builds, set API_URL in your .env or eas.json.
+// Fallback chain: eas extra.apiUrl → env var → hardcoded local dev IP
+const BASE_URL =
+  Constants.expoConfig?.extra?.apiUrl ??
+  process.env.BASE_URL ??
+  'http://192.168.1.245:8000/api';
 
 export default BASE_URL;

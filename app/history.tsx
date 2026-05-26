@@ -1,4 +1,4 @@
-// app/history.jsx
+// app/history.tsx
 
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
@@ -7,9 +7,29 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import SharedHeader from '../components/SharedHeader';
 import { useUser } from '../context/UserContext';
 import styles from '../styles/History';
-import BASE_URL from '../utils/api';
+import { useAuthFetch } from '../utils/authFetch';
 
-function DigitalCard({ record, dark, onAddImage, onReplaceImage, onRemoveImage, onViewImage }) {
+interface VaxRecord {
+  id:           number;
+  vaccine:      string;
+  dose:         string;
+  date:         string;
+  facility:     string;
+  administered: string;
+  cardImage:    string | null;
+  color:        string;
+}
+
+interface DigitalCardProps {
+  record:         VaxRecord;
+  dark:           boolean;
+  onAddImage:     (id: number) => void;
+  onReplaceImage: (id: number) => void;
+  onRemoveImage:  (id: number) => void;
+  onViewImage:    (record: VaxRecord) => void;
+}
+
+function DigitalCard({ record, dark, onAddImage, onReplaceImage, onRemoveImage, onViewImage }: DigitalCardProps)  {
   const C = {
     card:   dark ? '#1e2928' : '#ffffff',
     border: dark ? '#2e3837' : '#e8f0ef',
@@ -96,12 +116,13 @@ function DigitalCard({ record, dark, onAddImage, onReplaceImage, onRemoveImage, 
 }
 
 export default function HistoryScreen() {
-  const { username, darkMode, avatarUri } = useUser();
+  const { username, darkMode, avatarUri, userId } = useUser();
+  const authFetch = useAuthFetch();
   const dark = darkMode;
 
-  const [records, setRecords]           = useState([]);
+  const [records, setRecords]           = useState<VaxRecord[]>([]);
   const [loading, setLoading]           = useState(true);
-  const [viewingImage, setViewingImage] = useState(null);
+  const [viewingImage, setViewingImage] = useState<VaxRecord | null>(null);
 
   const C = {
     bg:     dark ? '#1a1f1e' : '#EEF7F6',
@@ -117,23 +138,18 @@ export default function HistoryScreen() {
 
   const fetchHistory = async () => {
     try {
-      // Step 1: Resolve username → numeric patient ID
-      const patientsRes = await fetch(`${BASE_URL}/patients/`);
-      const patients = await patientsRes.json();
-      const patient = patients.find(p => p.username === username);
-
-      if (!patient) {
-        console.log('Patient not found for username:', username);
-        setLoading(false);
-        return;
+      let patientId: number | null = userId ?? null;
+      if (!patientId) {
+        const patients: any[] = await authFetch('/patients/');
+        const patient = patients.find((p: any) => p.username === username);
+        if (!patient) { setLoading(false); return; }
+        patientId = patient.id;
       }
 
-      // Step 2: Fetch vaccination history by patient ID
-      const histRes = await fetch(`${BASE_URL}/vaccination-history/patient/${patient.id}/`);
-      const data = await histRes.json();
+      const data: any[] = await authFetch(`/vaccination-history/patient/${patientId}/`);
 
       if (Array.isArray(data) && data.length > 0) {
-        const mapped = data.map((item, index) => ({
+        const mapped: VaxRecord[] = data.map((item: any, index: number) => ({
           id:           item.id,
           vaccine:      item.vaccine_name || item.vaccine,
           dose:         item.dose,
@@ -152,7 +168,7 @@ export default function HistoryScreen() {
     }
   };
 
-  const pickImage = async () => {
+  const pickImage = async (): Promise<string | null> => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') { Alert.alert('Permission needed', 'Please allow access to your photo library.'); return null; }
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, aspect: [4, 3], quality: 0.8 });
@@ -160,17 +176,17 @@ export default function HistoryScreen() {
     return null;
   };
 
-  const handleAddImage = async (id) => {
+  const handleAddImage = async (id: number) => {
     const uri = await pickImage();
     if (uri) setRecords(prev => prev.map(r => r.id === id ? { ...r, cardImage: uri } : r));
   };
 
-  const handleReplaceImage = async (id) => {
+  const handleReplaceImage = async (id: number) => {
     const uri = await pickImage();
     if (uri) setRecords(prev => prev.map(r => r.id === id ? { ...r, cardImage: uri } : r));
   };
 
-  const handleRemoveImage = (id) => {
+  const handleRemoveImage = (id: number) => {
     Alert.alert('Remove Photo', 'Are you sure you want to remove this vaccination card photo?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Remove', style: 'destructive', onPress: () => setRecords(prev => prev.map(r => r.id === id ? { ...r, cardImage: null } : r)) },
@@ -216,7 +232,7 @@ export default function HistoryScreen() {
                 <Image source={{ uri: avatarUri }} style={styles.patientAvatar} />
               ) : (
                 <View style={[styles.patientAvatarPlaceholder, { backgroundColor: dark ? '#1e3330' : '#e0f7f4' }]}>
-                  <Text style={{ fontSize: 22, color: '#2BAF9E', fontWeight: '700' }}>{username.charAt(0).toUpperCase()}</Text>
+                  <Text style={{ fontSize: 22, color: '#2BAF9E', fontWeight: '700' }}>{username?.charAt(0).toUpperCase() ?? '?'}</Text>
                 </View>
               )}
               <View>

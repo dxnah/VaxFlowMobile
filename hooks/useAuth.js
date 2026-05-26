@@ -5,7 +5,7 @@ import { useUser } from "../context/UserContext";
 
 export default function useAuth() {
   const router = useRouter();
-  const { setUsername } = useUser();
+  const { saveSession, clearSession } = useUser();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -15,6 +15,7 @@ export default function useAuth() {
       return;
     }
     setLoading(true);
+    setError("");
     try {
       const response = await fetch(`${BASE_URL}/login/`, {
         method: "POST",
@@ -22,22 +23,22 @@ export default function useAuth() {
         body: JSON.stringify({ username, password }),
       });
       const data = await response.json();
-      if (response.ok) {
-        setError("");
-        setUsername(data.user?.username || data.username || username);
-        router.push("/dashboard");
+      if (response.ok && data.token) {
+        await saveSession(data.token, data.user);
+        router.replace("/dashboard");
       } else {
-        setError(data.error || "Invalid username or password");
+        setError(data.detail || data.error || "Invalid username or password");
       }
     } catch (err) {
-      setError("Cannot connect to server.");
+      setError("Cannot connect to server. Check your network.");
     } finally {
       setLoading(false);
     }
   };
 
-  const logout = () => {
-    router.push("/login");
+  const logout = async () => {
+    await clearSession();
+    router.replace("/login");
   };
 
   return { login, logout, error, loading };
