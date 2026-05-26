@@ -1,18 +1,25 @@
 {
   "cli": {
-    "version": ">= 18.1.0",
-    "appVersionSource": "remote"
+    "version": ">= 5.0.0"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "API_URL": "http://10.194.32.75:8000/api"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "API_URL": "https://vaxflow-backend.onrender.com/api"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "env": {
+        "API_URL": "https://vaxflow-backend.onrender.com/api"
+      }
     }
   },
   "submit": {
