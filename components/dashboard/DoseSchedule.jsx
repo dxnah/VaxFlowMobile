@@ -1,9 +1,9 @@
 // components/dashboard/DoseSchedule.jsx
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, View, ActivityIndicator } from 'react-native';
 import styles from '../../styles/DoseSchedule';
 import BASE_URL from '../../utils/api';
-import { UserContext } from '../../context/UserContext';
+import { useUser } from '../../context/UserContext';  // ← fixed import
 
 const ScheduleItem = ({ dose, date, completed }) => (
   <View style={styles.itemRow}>
@@ -22,15 +22,29 @@ const ScheduleItem = ({ dose, date, completed }) => (
 );
 
 export default function DoseSchedule() {
-  const { username } = useContext(UserContext);
+  const { username, userId } = useUser();  // ← fixed hook usage
   const [schedules, setSchedules] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState(null);
 
   useEffect(() => {
     const fetchSchedules = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/schedules/?username=${username}`);
+        // Step 1: Resolve patient ID (use cached userId when available)
+        let patientId = userId ?? null;
+        if (!patientId) {
+          const pRes = await fetch(`${BASE_URL}/patients/`);
+          if (!pRes.ok) throw new Error('Failed to fetch patients');
+          const patients = await pRes.json();
+          const patient = Array.isArray(patients)
+            ? patients.find(p => p.username === username)
+            : null;
+          if (!patient) { setLoading(false); return; }
+          patientId = patient.id;
+        }
+
+        // Step 2: Fetch dose schedules by patient ID (correct endpoint)
+        const res = await fetch(`${BASE_URL}/dose-schedules/patient/${patientId}/`);
         if (!res.ok) throw new Error('Failed to fetch schedules');
         const data = await res.json();
         setSchedules(data);

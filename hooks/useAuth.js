@@ -25,6 +25,7 @@ export default function useAuth() {
       const data = await response.json();
       if (response.ok && data.token) {
         await saveSession(data.token, data.user);
+        // _layout.tsx auth guard detects token and redirects to /dashboard
         router.replace("/dashboard");
       } else {
         setError(data.detail || data.error || "Invalid username or password");
@@ -38,7 +39,13 @@ export default function useAuth() {
 
   const logout = async () => {
     await clearSession();
-    router.replace("/login");
+    // _layout.tsx auth guard detects token=null and redirects to /login automatically
+    // But we also navigate explicitly as a fallback
+    try {
+      router.replace("/login");
+    } catch (_) {
+      // ignore if navigation isn't ready — auth guard will handle it
+    }
   };
 
   return { login, logout, error, loading };

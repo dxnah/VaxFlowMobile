@@ -26,7 +26,7 @@ const STATUS_BAR_HEIGHT =
 
 export default function DashboardScreen() {
   const router = useRouter();
-  const { username, darkMode, avatarUri } = useUser();
+  const { username, darkMode, avatarUri, clearSession } = useUser();
   const dark = darkMode;
 
   const [refreshing, setRefreshing] = useState(false);
@@ -54,9 +54,11 @@ export default function DashboardScreen() {
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 500);
   };
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setLogoutModalOpen(false);
-    router.replace("/login");
+    setSidebarOpen(false);
+    await clearSession();
+    // _layout.tsx auth guard detects token=null and redirects to /login automatically
   };
   const toggle = (setter: React.Dispatch<React.SetStateAction<boolean>>) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -146,11 +148,11 @@ export default function DashboardScreen() {
               ) : (
                 <View style={styles.sidebarAvatarPlaceholder}>
                   <Text style={styles.sidebarAvatarLetter}>
-                    {username.charAt(0).toUpperCase()}
+                    {(username ?? "")?.charAt(0)?.toUpperCase() ?? "?"}
                   </Text>
                 </View>
               )}
-              <Text style={styles.sidebarUsername}>{username}</Text>
+              <Text style={styles.sidebarUsername}>{username ?? ""}</Text>
             </View>
             <View style={styles.sidebarDivider} />
             <TouchableOpacity
@@ -223,7 +225,7 @@ export default function DashboardScreen() {
                   ]}
                 >
                   <Text style={styles.logoutPopupAvatarLetter}>
-                    {username.charAt(0).toUpperCase()}
+                    {(username ?? "")?.charAt(0)?.toUpperCase() ?? "?"}
                   </Text>
                 </View>
               )}
@@ -234,7 +236,7 @@ export default function DashboardScreen() {
                     { color: dark ? "#e8f0ef" : "#1a2e2c" },
                   ]}
                 >
-                  {username}
+                  {username ?? ""}
                 </Text>
                 <Text
                   style={[
@@ -272,7 +274,7 @@ export default function DashboardScreen() {
           <Text style={styles.menuButton}>☰</Text>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.greeting}>Hello, {username} 👋</Text>
+          <Text style={styles.greeting}>Hello, {username ?? ""} 👋</Text>
           <Text style={styles.subheading}>ABTC-CHO Vaccine Status</Text>
         </View>
         {/* Avatar now opens logout popup, NOT settings */}
@@ -285,7 +287,7 @@ export default function DashboardScreen() {
           ) : (
             <View style={styles.headerAvatarPlaceholder}>
               <Text style={styles.headerAvatarLetter}>
-                {username.charAt(0).toUpperCase()}
+                {(username ?? "")?.charAt(0)?.toUpperCase() ?? "?"}
               </Text>
             </View>
           )}
