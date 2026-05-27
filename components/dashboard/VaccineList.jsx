@@ -1,24 +1,44 @@
 // components/dashboard/VaccineList.jsx
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
-import { useUser } from '../../context/UserContext';
-import styles from '../../styles/VaccineList';
-import { useAuthFetch } from '../../utils/authFetch';
+import React, { useEffect, useState } from "react";
+import { Text, View } from "react-native";
+import { useUser } from "../../context/UserContext";
+import styles from "../../styles/VaccineList";
+import { useAuthFetch } from "../../utils/authFetch";
+import { VaccineListSkeleton } from "../SkeletonLoader";
 
 const STATUS_COLOR = {
-  'In Stock':  '#4caf50',
-  'Low Stock': '#ff9800',
-  'Out Stock': '#f44336',
+  "In Stock": "#4caf50",
+  "Low Stock": "#ff9800",
+  "Out Stock": "#f44336",
 };
 
 const VaccineCard = ({ name, status, available, dark }) => {
-  const color = STATUS_COLOR[status] || '#2BAF9E';
+  const color = STATUS_COLOR[status] || "#2BAF9E";
   return (
-    <View style={[styles.vaccineCard, { borderLeftColor: color, backgroundColor: dark ? '#242b2a' : '#fff' }]}>
+    <View
+      style={[
+        styles.vaccineCard,
+        { borderLeftColor: color, backgroundColor: dark ? "#242b2a" : "#fff" },
+      ]}
+    >
       <View style={styles.vaccineInfo}>
-        <Text style={[styles.vaccineName, { color: dark ? '#e8f0ef' : '#333', fontSize: 15 }]}>{name}</Text>
-        <Text style={{ color: dark ? '#7aada8' : '#888', fontSize: 12, marginTop: 2 }}>
-          Available: {available} — <Text style={{ color, fontWeight: '700' }}>{status}</Text>
+        <Text
+          style={[
+            styles.vaccineName,
+            { color: dark ? "#e8f0ef" : "#333", fontSize: 15 },
+          ]}
+        >
+          {name}
+        </Text>
+        <Text
+          style={{
+            color: dark ? "#7aada8" : "#888",
+            fontSize: 12,
+            marginTop: 2,
+          }}
+        >
+          Available: {available} —{" "}
+          <Text style={{ color, fontWeight: "700" }}>{status}</Text>
         </Text>
       </View>
     </View>
@@ -33,21 +53,35 @@ export default function VaccineList() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    authFetch('/vaccines/')
-      .then(data => setVaccines(data))
+    authFetch("/vaccines/")
+      .then((data) => setVaccines(data))
       .catch(() => setVaccines([]))
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <ActivityIndicator color="#2BAF9E" style={{ margin: 16 }} />;
+  if (loading) return <VaccineListSkeleton dark={dark} />;
 
   return (
     <View style={styles.container}>
       {vaccines.length === 0 ? (
-        <Text style={{ color: dark ? '#7aada8' : '#666', textAlign: 'center', padding: 16 }}>No vaccines found.</Text>
+        <Text
+          style={{
+            color: dark ? "#7aada8" : "#666",
+            textAlign: "center",
+            padding: 16,
+          }}
+        >
+          No vaccines found.
+        </Text>
       ) : (
-        vaccines.map(v => (
-          <VaccineCard key={v.id} name={v.name} status={v.status} available={v.available} dark={dark} />
+        vaccines.map((v) => (
+          <VaccineCard
+            key={v.id}
+            name={v.name}
+            status={v.status}
+            available={v.available}
+            dark={dark}
+          />
         ))
       )}
     </View>

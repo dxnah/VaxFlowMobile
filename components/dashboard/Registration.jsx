@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { useUser } from "../../context/UserContext";
 import BASE_URL from "../../utils/api";
+import { RegistrationSkeleton } from "../SkeletonLoader";
 
 const QUESTIONS = [
   {
@@ -143,6 +144,7 @@ export default function Registration({ onDone }) {
   const [savedList, setSavedList] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [patientId, setPatientId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const [showBdayPicker, setShowBdayPicker] = useState(false);
   const [bdYear, setBdYear] = useState(2000);
@@ -162,11 +164,13 @@ export default function Registration({ onDone }) {
         ? patients.find((p) => p.username === username)
         : null;
 
-      if (!patient) return;
+      if (!patient) { setLoading(false); return; } 
       setPatientId(patient.id);
-      fetchRegistrations(patient.id);
+      await fetchRegistrations(patient.id);
     } catch (e) {
       console.log("Patient fetch error:", e);
+    } finally {
+      setLoading(false);  
     }
   };
 
@@ -234,6 +238,8 @@ export default function Registration({ onDone }) {
     animate();
     setForm((p) => ({ ...p, birthdate: "", age: "" }));
   };
+
+  if (loading) return <RegistrationSkeleton dark={dark} />;
 
   const animate = () => LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 

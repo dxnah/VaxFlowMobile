@@ -5,6 +5,6 @@ import Constants from 'expo-constants';
 const BASE_URL =
   Constants.expoConfig?.extra?.apiUrl ??
   process.env.BASE_URL ??
-  'http://192.168.1.245:8000/api';
+  'http://10.80.216.75:8000/api';
 
 export default BASE_URL;

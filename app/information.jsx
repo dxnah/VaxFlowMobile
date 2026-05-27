@@ -3,7 +3,6 @@
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -12,11 +11,11 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { VaccineInfoSkeleton } from "../components/SkeletonLoader";
 import { useUser } from "../context/UserContext";
 import styles from "../styles/Information";
 import BASE_URL from "../utils/api";
 
-// ── Static educational content (never changes) ────────────────────────────────
 const VACCINES_STATIC = [
   {
     id: 1,
@@ -133,22 +132,18 @@ const STATUS_COLOR = {
   low_stock: "#ff9800",
   out_stock: "#f44336",
 };
-
 const STATUS_LABEL = {
   in_stock: "In Stock",
   low_stock: "Low Stock",
   out_stock: "Out of Stock",
 };
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 function normalize(str = "") {
   return str.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
-
 function matchVaccine(staticV, backendV) {
   const sName = normalize(staticV.name);
   const bName = normalize(backendV.name);
-  // exact match or one contains the other's first word
   const sFirst = normalize(staticV.name.split(" ")[0]);
   const bFirst = normalize(backendV.name.split(" ")[0]);
   return (
@@ -159,10 +154,8 @@ function matchVaccine(staticV, backendV) {
   );
 }
 
-// ── VaccineCard ───────────────────────────────────────────────────────────────
 function VaccineCard({ vaccine, dark }) {
   const [expanded, setExpanded] = useState(false);
-
   const C = {
     card: dark ? "#242b2a" : "#ffffff",
     text: dark ? "#e8f0ef" : "#1a2e2c",
@@ -170,7 +163,6 @@ function VaccineCard({ vaccine, dark }) {
     border: dark ? "#2e3837" : "#f0f0f0",
     tagBg: dark ? vaccine.bgDark : vaccine.bgLight,
   };
-
   const statusColor = STATUS_COLOR[vaccine.status] || "#9e9e9e";
   const statusLabel = STATUS_LABEL[vaccine.status] || "Unknown";
 
@@ -188,7 +180,6 @@ function VaccineCard({ vaccine, dark }) {
       ]}
     >
       <View style={[styles.cardAccent, { backgroundColor: vaccine.color }]} />
-
       <View style={styles.cardHeader}>
         <View
           style={[
@@ -198,12 +189,10 @@ function VaccineCard({ vaccine, dark }) {
         >
           <Text style={{ fontSize: 22 }}>{vaccine.emoji}</Text>
         </View>
-
         <View style={{ flex: 1 }}>
           <Text style={[styles.vaccineName, { color: C.text }]}>
             {vaccine.name}
           </Text>
-
           <View
             style={{
               flexDirection: "row",
@@ -221,8 +210,6 @@ function VaccineCard({ vaccine, dark }) {
                 {vaccine.disease.split("•")[0].trim()}
               </Text>
             </View>
-
-            {/* FROM BACKEND — status badge */}
             {vaccine.status ? (
               <View
                 style={{
@@ -244,15 +231,11 @@ function VaccineCard({ vaccine, dark }) {
               </View>
             ) : null}
           </View>
-
-          {/* FROM BACKEND — available count */}
           {vaccine.available !== undefined && vaccine.available !== null ? (
             <Text style={{ fontSize: 11, color: C.sub, marginTop: 2 }}>
               Available: {vaccine.available} doses
             </Text>
           ) : null}
-
-          {/* FROM BACKEND — min stock warning */}
           {vaccine.min_stock !== undefined &&
           vaccine.available !== undefined &&
           vaccine.available <= vaccine.min_stock &&
@@ -269,7 +252,6 @@ function VaccineCard({ vaccine, dark }) {
             </Text>
           ) : null}
         </View>
-
         <View
           style={[
             styles.chevron,
@@ -297,7 +279,6 @@ function VaccineCard({ vaccine, dark }) {
 
       {expanded && (
         <View style={[styles.cardBody, { borderTopColor: C.border }]}>
-          {/* STATIC — educational info */}
           <View style={styles.detailRow}>
             <View
               style={[
@@ -313,7 +294,6 @@ function VaccineCard({ vaccine, dark }) {
               {vaccine.disease}
             </Text>
           </View>
-
           <View style={styles.detailRow}>
             <View
               style={[
@@ -329,7 +309,6 @@ function VaccineCard({ vaccine, dark }) {
               {vaccine.age}
             </Text>
           </View>
-
           <View style={styles.detailRow}>
             <View
               style={[
@@ -345,8 +324,6 @@ function VaccineCard({ vaccine, dark }) {
               {vaccine.doses}
             </Text>
           </View>
-
-          {/* FROM BACKEND — ml recommended */}
           {vaccine.ml_recommended !== undefined &&
           vaccine.ml_recommended > 0 ? (
             <View style={styles.detailRow}>
@@ -365,7 +342,6 @@ function VaccineCard({ vaccine, dark }) {
               </Text>
             </View>
           ) : null}
-
           <View
             style={[
               styles.sideEffectsBox,
@@ -395,7 +371,6 @@ function VaccineCard({ vaccine, dark }) {
   );
 }
 
-// ── InformationScreen ─────────────────────────────────────────────────────────
 export default function InformationScreen() {
   const router = useRouter();
   const { darkMode } = useUser();
@@ -417,9 +392,7 @@ export default function InformationScreen() {
       const res = await fetch(`${BASE_URL}/vaccines/`);
       if (!res.ok) throw new Error("Server error");
       const data = await res.json();
-
       if (Array.isArray(data) && data.length > 0) {
-        // Merge: static (educational) + backend (stock info)
         const merged = VACCINES_STATIC.map((staticV) => {
           const backendV = data.find((b) => matchVaccine(staticV, b));
           if (!backendV) return staticV;
@@ -456,7 +429,6 @@ export default function InformationScreen() {
         barStyle="light-content"
       />
 
-      {/* Header */}
       <View style={[headerStyles.header, { backgroundColor: topBar }]}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -471,27 +443,20 @@ export default function InformationScreen() {
 
       <View style={{ flex: 1, backgroundColor: dark ? "#1a1f1e" : "#EEF7F6" }}>
         {loading ? (
-          <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          // ── Skeleton replaces spinner ──────────────────────────────────────
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
           >
-            <ActivityIndicator size="large" color="#2BAF9E" />
-            <Text
-              style={{
-                color: dark ? "#7aada8" : "#6b7280",
-                marginTop: 10,
-                fontSize: 13,
-              }}
-            >
-              Loading vaccines...
-            </Text>
-          </View>
+            <VaccineInfoSkeleton dark={dark} />
+          </ScrollView>
         ) : (
           <ScrollView
             style={{ flex: 1 }}
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
-            {/* Error banner */}
             {error && (
               <View
                 style={{
@@ -523,8 +488,6 @@ export default function InformationScreen() {
                 </TouchableOpacity>
               </View>
             )}
-
-            {/* Intro */}
             <View
               style={[
                 styles.introBanner,
@@ -544,8 +507,6 @@ export default function InformationScreen() {
                 recommended age, number of doses, and possible side effects.
               </Text>
             </View>
-
-            {/* Stock summary row */}
             {!error && (
               <View
                 style={{
@@ -594,8 +555,6 @@ export default function InformationScreen() {
                 ))}
               </View>
             )}
-
-            {/* Count */}
             <View style={styles.countRow}>
               <Text
                 style={[
@@ -614,8 +573,6 @@ export default function InformationScreen() {
                 <Text style={styles.countNum}>{vaccines.length}</Text>
               </View>
             </View>
-
-            {/* Cards */}
             {vaccines.map((v) => (
               <VaccineCard key={v.id} vaccine={v} dark={dark} />
             ))}
