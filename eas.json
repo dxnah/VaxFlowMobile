@@ -19,6 +19,9 @@
       }
     },
     "production": {
+            "android": {
+        "buildType": "apk"
+      },
       "env": {
         "API_URL": "https://vaxflow-backend.onrender.com"
       }
