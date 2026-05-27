@@ -15,12 +15,12 @@
         "buildType": "apk"
       },
       "env": {
-        "API_URL": "https://vaxflow-backend.onrender.com/api"
+        "API_URL": "https://vaxflow-backend.onrender.com"
       }
     },
     "production": {
       "env": {
-        "API_URL": "https://vaxflow-backend.onrender.com/api"
+        "API_URL": "https://vaxflow-backend.onrender.com"
       }
     }
   },
