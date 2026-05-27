@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import BASE_URL from "../utils/api";
 import { useUser } from "../context/UserContext";
+import BASE_URL from "../utils/api";
 
 export default function useAuth() {
   const router = useRouter();
@@ -23,9 +23,10 @@ export default function useAuth() {
         body: JSON.stringify({ username, password }),
       });
       const data = await response.json();
-      if (response.ok && data.token) {
-        await saveSession(data.token, data.refresh_token ?? null, data.user);
-        // _layout.tsx auth guard detects token and redirects to /dashboard
+      if (response.ok && (data.user || data.username)) {
+        const user = data.user ?? data;
+        await saveSession(user);
+        // _layout.tsx auth guard detects authenticated user and redirects to /dashboard
         router.replace("/dashboard");
       } else {
         setError(data.detail || data.error || "Invalid username or password");

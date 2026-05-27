@@ -1,4 +1,6 @@
-export default {
+require('dotenv').config();
+
+module.exports = {
   expo: {
     name: "VaxFlow",
     slug: "vaxflow_mobile",
@@ -23,13 +25,16 @@ export default {
     web: { output: "static", favicon: "./assets/images/favicon.png" },
     plugins: [
       "expo-router",
-      ["expo-splash-screen", {
-        image: "./assets/images/logoit.png",
-        imageWidth: 200,
-        resizeMode: "contain",
-        backgroundColor: "#ffffff",
-        dark: { backgroundColor: "#000000" },
-      }],
+      [
+        "expo-splash-screen",
+        {
+          image: "./assets/images/logoit.png",
+          imageWidth: 200,
+          resizeMode: "contain",
+          backgroundColor: "#ffffff",
+          dark: { backgroundColor: "#000000" },
+        },
+      ],
       "expo-web-browser",
     ],
     experiments: {
@@ -37,7 +42,14 @@ export default {
       reactCompiler: true,
     },
     extra: {
-      apiUrl: process.env.API_URL ?? 'http://10.194.32.75:8000/api',
+      baseUrl:
+        process.env.BASE_URL ??
+        process.env.API_URL ??
+        "http://10.194.32.75:8000/api",
+      apiUrl:
+        process.env.API_URL ??
+        process.env.BASE_URL ??
+        "http://10.194.32.75:8000/api",
       router: {},
       eas: {
         projectId: "4e967caf-9f6b-4b60-bc0a-cc6e5a83da95",
