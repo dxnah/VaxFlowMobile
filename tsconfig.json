@@ -13,6 +13,6 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "app/index.jsx"
-  ],
+, "context/UserContext.tsx"  ],
   "exclude": ["node_modules", "**/node_modules/*"]
 }

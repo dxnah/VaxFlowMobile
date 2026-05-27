@@ -45,11 +45,11 @@ module.exports = {
       baseUrl:
         process.env.BASE_URL ??
         process.env.API_URL ??
-        "http://10.194.32.75:8000/api",
+        "https://vaxflow-backend.onrender.com",
       apiUrl:
         process.env.API_URL ??
         process.env.BASE_URL ??
-        "http://10.194.32.75:8000/api",
+        "https://vaxflow-backend.onrender.com",
       router: {},
       eas: {
         projectId: "4e967caf-9f6b-4b60-bc0a-cc6e5a83da95",
