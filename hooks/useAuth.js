@@ -24,7 +24,7 @@ export default function useAuth() {
       });
       const data = await response.json();
       if (response.ok && data.token) {
-        await saveSession(data.token, data.user);
+        await saveSession(data.token, data.refresh_token ?? null, data.user);
         // _layout.tsx auth guard detects token and redirects to /dashboard
         router.replace("/dashboard");
       } else {

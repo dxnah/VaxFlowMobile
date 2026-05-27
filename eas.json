@@ -7,7 +7,7 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "API_URL": "http://10.194.32.75:8000/api"
+        "API_URL": "http://10.80.216.75:8000/api"
       }
     },
     "preview": {
@@ -15,15 +15,15 @@
         "buildType": "apk"
       },
       "env": {
-        "API_URL": "https://vaxflow-backend.onrender.com"
+        "API_URL": "https://vaxflow-backend.onrender.com/api"
       }
     },
     "production": {
-            "android": {
+      "android": {
         "buildType": "apk"
       },
       "env": {
-        "API_URL": "https://vaxflow-backend.onrender.com"
+        "API_URL": "https://vaxflow-backend.onrender.com/api"
       }
     }
   },

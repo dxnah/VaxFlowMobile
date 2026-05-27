@@ -24,6 +24,9 @@ export default function SharedHeader({ title, subtitle }: Props) {
   const { username, darkMode, avatarUri } = useUser();
   const dark = darkMode;
 
+  // Safe initial letter — username can be null/empty during hydration or after logout
+  const initial = username ? username.charAt(0).toUpperCase() : '?';
+
   const headerBg = dark ? '#1a2e2c' : '#2BAF9E';
   const statusBg = dark ? '#1a2e2c' : '#2BAF9E';
 
@@ -47,10 +50,10 @@ export default function SharedHeader({ title, subtitle }: Props) {
                 <Image source={{ uri: avatarUri }} style={styles.sidebarAvatar} />
               ) : (
                 <View style={styles.sidebarAvatarPlaceholder}>
-                  <Text style={styles.sidebarAvatarLetter}>{username.charAt(0).toUpperCase()}</Text>
+                  <Text style={styles.sidebarAvatarLetter}>{initial}</Text>
                 </View>
               )}
-              <Text style={styles.sidebarUsername}>{username}</Text>
+              <Text style={styles.sidebarUsername}>{username ?? ''}</Text>
             </View>
 
             <View style={styles.sidebarDivider} />
@@ -90,7 +93,7 @@ export default function SharedHeader({ title, subtitle }: Props) {
               <Image source={{ uri: avatarUri }} style={styles.avatarImage} />
             ) : (
               <View style={styles.avatarFallback}>
-                <Text style={styles.avatarLetter}>{username.charAt(0).toUpperCase()}</Text>
+                <Text style={styles.avatarLetter}>{initial}</Text>
               </View>
             )}
           </View>

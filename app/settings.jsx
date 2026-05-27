@@ -25,7 +25,7 @@ export default function SettingsScreen() {
   const { logout } = useAuth();
   const { username, setUsername, darkMode, setDarkMode, avatarUri, setAvatarUri } = useUser();
 
-  const [localUsername, setLocalUsername] = useState(username);
+  const [localUsername, setLocalUsername] = useState(username ?? '');
   const [currentPass,   setCurrentPass]   = useState('');
   const [newPass,       setNewPass]       = useState('');
   const [confirmPass,   setConfirmPass]   = useState('');
